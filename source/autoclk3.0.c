@@ -1259,14 +1259,8 @@ void main(void)
 				{
 					menu_option_runP0();
 				}
-
-
-
-
-
 				//bell_H(h);
 				//bell_S(s);
-
 		//	}
 
 	} //while loop
