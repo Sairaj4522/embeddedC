@@ -6359,9 +6359,9 @@ void main(void)
 				{
 					menu_option_runP0();
     2894:	0e 94 34 17 	call	0x2e68	; 0x2e68 <menu_option_runP0>
+				}
 				//bell_H(h);
 				//bell_S(s);
-
 		//	}
 
 	} //while loop

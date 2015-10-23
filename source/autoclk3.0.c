@@ -56,6 +56,18 @@
 *	Added one more Mode switch to the PCB design so as to support Duos version of the Autoclk Product.
 *	Need to update code so as to support that functionality.
 *
+*	23-Oct-2015
+*	Added Buzzer to eagle schematic and pcb, and final change has been done for this version of AutoClk
+*
+*	Port C Pins usage
+*	PC2		Buzzer
+*	PC3		bell1
+*	//Only hardware support so far
+*	PC4		bell2
+*	PC5		bell3
+*	PC6		bell4
+*	PC7		bell5
+*
 *
 *************************************************************/
 
@@ -1574,7 +1586,7 @@ void menu_option_runP0(void)
 		if((hr==(eeprom_read_word((uint16_t *) (MODE0 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE0 + i*2+2) )%100)))
 		{
 			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(bell) and PC3(buzzer) will go high
+			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(buzzer) and PC3(bell1) will go high
 			_delay_ms(500);
 			PORTC = (PC2<<0)|(PC3<<0);
 			//lcd_command_write(0x01);
@@ -1605,7 +1617,7 @@ void menu_option_runP1(void)
 		if((hr==(eeprom_read_word((uint16_t *) (MODE1 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE1 + i*2+2) )%100)))
 		{
 			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(bell) and PC3(buzzer) will go high
+			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(buzzer) and PC3(bell1) will go high
 			_delay_ms(500);
 			PORTC = (PC2<<0)|(PC3<<0);
 			//lcd_command_write(0x01);
@@ -1636,7 +1648,7 @@ void menu_option_runP2(void)
 		if((hr==(eeprom_read_word((uint16_t *) (MODE2 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE2 + i*2+2) )%100)))
 		{
 			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(bell) and PC3(buzzer) will go high
+			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
 			_delay_ms(500);
 			PORTC = (PC2<<0)|(PC3<<0);
 			//lcd_command_write(0x01);
