@@ -783,10 +783,10 @@ void main(void)
 										int i,i_prev;
 										int  intervals = eeprom_read_word(MODE0);
 
+									P0_modify:
 
 										lcd_cursor(2,1);
 										lcd_string_write("  :         of  ");
-										P0_modify:
 										while(1)
 											{
 											i = (ReadVoltage()*0.090196078);
@@ -954,10 +954,10 @@ void main(void)
 									int i,i_prev;
 									int  intervals = eeprom_read_word(MODE1);
 
+								P1_modify:
 
 									lcd_cursor(2,1);
 									lcd_string_write("  :         of  ");
-									P1_modify:
 									while(1)
 										{
 										i = (ReadVoltage()*0.090196078);
@@ -1123,10 +1123,10 @@ void main(void)
 									int i,i_prev;
 									int  intervals = eeprom_read_word(MODE2);
 
+								P2_modify:
 
 									lcd_cursor(2,1);
 									lcd_string_write("  :         of  ");
-									P2_modify:
 									while(1)
 										{
 										i = (ReadVoltage()*0.090196078);
