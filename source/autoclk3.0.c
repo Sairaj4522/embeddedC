@@ -797,7 +797,7 @@ void main(void)
 											if(i-i_prev !=0)
 											{
 												lcd_cursor(2,1);
-												lcd_string_write("  :        ");
+												lcd_string_write("  :         of  ");
 											}
 											lcd_cursor(1,1);
 											lcd_string_write("HRS:MIN   P0 T");
@@ -968,7 +968,7 @@ void main(void)
 										if(i-i_prev !=0)
 										{
 										lcd_cursor(2,1);
-										lcd_string_write("  :        ");
+										lcd_string_write("  :         of  ");
 										}
 										lcd_cursor(1,1);
 										lcd_string_write("HRS:MIN   P1 T");
@@ -1137,7 +1137,7 @@ void main(void)
 										if(i-i_prev !=0)
 										{
 										lcd_cursor(2,1);
-										lcd_string_write("  :        ");
+										lcd_string_write("    ");
 										}
 										lcd_cursor(1,1);
 										lcd_string_write("HRS:MIN   P2 T");
