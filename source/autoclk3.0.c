@@ -1261,15 +1261,15 @@ void main(void)
 			// else { // RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
 				if((temp1 & 0x10)!=0x00)
 				{
-					menu_option_runP1();
+					menu_option_run(MODE1, 1);
 				}
 				if((temp1 & 0x20)!=0x00)
 				{
-					menu_option_runP2();
+					menu_option_run(MODE2, 2);
 				}
 				if(((temp1 & 0x10)==0x00) && ((temp1 & 0x20)==0x00))
 				{
-					menu_option_runP0();
+					menu_option_run(MODE0, 0);
 				}
 				//bell_H(h);
 				//bell_S(s);
@@ -1570,6 +1570,7 @@ int menu_option_P2(void)// normal mode to be changed to custom mode
 
 }
 
+/*
 void menu_option_runP0(void)
 {
 	int i=0; //restart counter
@@ -1658,6 +1659,52 @@ void menu_option_runP2(void)
 			break;
 		temp1=PINA;
 		if(((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00))
+		{
+			break;
+		}
+	}
+}
+*/
+
+void menu_option_run(const int mode_addr, const int mode)
+{
+	int i=0; //restart counter
+	int intervals = 0;
+	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
+	int break_loop = 0;
+
+	while(1)
+	{
+		display_time();
+		lcd_cursor(2,15);
+		lcd_string_write("P");
+		lcd_number_write(mode, 10);
+		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100)))
+		{
+			//  ring_bell_long(1);
+			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
+			_delay_ms(500);
+			PORTC = (PC2<<0)|(PC3<<0);
+			//lcd_command_write(0x01);
+			i++;
+		}
+		if(i>intervals)
+			break;
+		temp1=PINA;
+
+		switch(mode){
+			case 0:
+				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
+				break;
+			case 1:
+				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
+				break;
+			case 2:
+				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
+				break;
+
+		}
+		if(break_loop == 0)
 		{
 			break;
 		}
