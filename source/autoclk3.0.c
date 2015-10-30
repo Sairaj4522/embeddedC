@@ -124,11 +124,11 @@
 #define MODE1 170
 #define MODE2 340
 
-int h1=0;
-int h0=0;
+//int h1=0;
+//int h0=0;
 //int s0=0;
 unsigned char temp1;
-char *ampm_bit[] = {
+/*char *ampm_bit[] = {
                     "AM",
 					"PM",
 					};
@@ -136,18 +136,10 @@ char *ampm_bit[] = {
 char *display_format[] = {
 					      "  :  :  ",
                           "  /  /  ",
-		       	         };
+		       	         };*/
 
 // global declaration
-unsigned char date, month, year, hr, min, sec = 0;
-
-//Dec2Hex converter
-/*
-char Dec2Hex (int dec)
-{
-
-}
-*/
+unsigned char date, month, year, hr, min, sec;
 
 //Function to display date and time on the LCD
 
@@ -161,19 +153,19 @@ void display_time(void) {
 	                    "FRI",
 	                    "SAT",
 	    	       	   };
-	unsigned char second_byte = 0,minute_byte = 0,hour_byte = 0;
-	int day1;
-	unsigned char day = 0;
+	//unsigned char second_byte = 0,minute_byte = 0,hour_byte = 0;
+	int day1 = 0;
+	//unsigned char day = 0;
 
-	unsigned char prev_sec = 0,prev_hour_byte = 0;
+	//unsigned char prev_sec = 0,prev_hour_byte = 0;
 
-	hour_byte = ds1307_read_hour();            // read hour regiter and store
+	//hour_byte = ds1307_read_hour();            // read hour regiter and store
 	//hour_byte = hour_calculation(hour_byte);// call for mode display
-	hr=convert_bcd_to_decimal(hour_byte);
-	minute_byte = ds1307_read_minute();       // read minute regiter and store
-	min=convert_bcd_to_decimal(minute_byte);
-	second_byte = ds1307_read_second();        // read seconds regiter and store
-	sec = convert_bcd_to_decimal(second_byte);
+	hr=convert_bcd_to_decimal(ds1307_read_hour());
+	//minute_byte = ds1307_read_minute();       // read minute regiter and store
+	min=convert_bcd_to_decimal(ds1307_read_minute());
+	//second_byte = ds1307_read_second();        // read seconds regiter and store
+	sec = convert_bcd_to_decimal(ds1307_read_second());
 
 	day1=convert_bcd_to_decimal(ds1307_read_day());
 	date=convert_bcd_to_decimal(ds1307_read_date());
@@ -217,9 +209,9 @@ void display_time(void) {
 
 
 	lcd_cursor(1,13);
-	day=weekdays[day1-1];
+	//day=weekdays[day1-1];
 	//lcd_number_write(day1,10);
-	lcd_string_write(day);
+	lcd_string_write(weekdays[day1-1]);
 	//lcd_data_write(day);
 
     // displaying style
@@ -271,7 +263,7 @@ void display_date_time_format(){
 }
 
 //adc to set time of the clock
-unsigned char ADC_Conversion(unsigned char);
+//unsigned char ADC_Conversion(unsigned char);
 unsigned char ADC_Value;
 
 //Function to Initialize ADC
@@ -421,16 +413,447 @@ int print_month(char row, char coloumn,unsigned char channel) {
 		   return 12;
 }
 
+int menu_option_resetP0()// normal mode to be changed to custom mode
+{
+	//P0
+
+	int intervals;
+
+	lcd_command_write(0x01); //clear screen
+	lcd_cursor(1,1);
+
+	lcd_string_write("No. of timings?");
+	lcd_cursor(2,1);
+
+	while(1)
+	{
+		intervals = print_minute(2,1,0);
+		temp1=PINA;
+
+		if((temp1 & 0x01)!=0x00) // OK button
+		{
+			lcd_command_write(0x01); //clear screen
+			break;
+		}
+
+		if((temp1 & 0x02)!=0x00) // EXIT button
+		{
+			lcd_command_write(0x01); //clear screen
+			return 0;
+		}
+
+	}
+
+	eeprom_write_word((uint16_t *) (MODE0) , intervals);
+
+	int i;
+	for(i=0; i<intervals; i++)
+	{
+		clock:
+		lcd_cursor(1,1);
+		lcd_string_write("HRS:min   P0 T");
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,1);
+		lcd_string_write("  :         of  ");
+		lcd_cursor(2,11);
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,15);
+		lcd_number_write(intervals,10);
+
+
+
+		while(1) // setting hrs
+		{
+			temp1=PINA;
+			hr=print_hour(2,1,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				return 0;
+				break;
+			}
+		}
+
+		lcd_cursor(1,1);
+		lcd_string_write("hrs:MIN   P0 T");
+
+		while(1) // setting minutes
+		{
+			temp1=PINA;
+			min=print_minute(2,4,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				goto clock;
+				break;
+			}
+		}
+		eeprom_write_word((uint16_t *) (MODE0+i*2+2) , (hr*100+min));
+		lcd_cursor(2,9);
+//		lcd_number_write((MODE1+i*2),10);
+//		_delay_ms(100);
+		lcd_command_write(0x01); //clear screen
+
+	}
+
+}
+
+int menu_option_resetP1()// normal mode to be changed to custom mode
+{
+	//P0
+
+	int intervals;
+
+	lcd_command_write(0x01); //clear screen
+	lcd_cursor(1,1);
+
+	lcd_string_write("No. of timings?");
+	lcd_cursor(2,1);
+
+	while(1)
+	{
+		intervals = print_minute(2,1,0);
+		temp1=PINA;
+
+		if((temp1 & 0x01)!=0x00) // OK button
+		{
+			lcd_command_write(0x01); //clear screen
+			break;
+		}
+
+		if((temp1 & 0x02)!=0x00) // EXIT button
+		{
+			lcd_command_write(0x01); //clear screen
+			return 0;
+		}
+
+	}
+
+	eeprom_write_word((uint16_t *) (MODE1) , intervals);
+
+	int i;
+	for(i=0; i<intervals; i++)
+	{
+		clock:
+		lcd_cursor(1,1);
+		lcd_string_write("HRS:min   P1 T");
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,1);
+		lcd_string_write("  :         of  ");
+		lcd_cursor(2,11);
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,15);
+		lcd_number_write(intervals,10);
+
+
+
+		while(1) // setting hrs
+		{
+			temp1=PINA;
+			hr=print_hour(2,1,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				return 0;
+				break;
+			}
+		}
+
+		lcd_cursor(1,1);
+		lcd_string_write("hrs:MIN   P1 T");
+
+		while(1) // setting minutes
+		{
+			temp1=PINA;
+			min=print_minute(2,4,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				goto clock;
+				break;
+			}
+		}
+		eeprom_write_word((uint16_t *) (MODE1+i*2+2) , (hr*100+min));
+		lcd_cursor(2,9);
+//		lcd_number_write((MODE1+i*2),10);
+//		_delay_ms(100);
+		lcd_command_write(0x01); //clear screen
+
+	}
+
+}
+
+int menu_option_resetP2()// normal mode to be changed to custom mode
+{
+	//P0
+
+	int intervals;
+
+	lcd_command_write(0x01); //clear screen
+	lcd_cursor(1,1);
+
+	lcd_string_write("No. of alarms?");
+	lcd_cursor(2,1);
+
+	while(1)
+	{
+		intervals = print_minute(2,1,0);
+		temp1=PINA;
+
+		if((temp1 & 0x01)!=0x00) // OK button
+		{
+			lcd_command_write(0x01); //clear screen
+			break;
+		}
+
+		if((temp1 & 0x02)!=0x00) // EXIT button
+		{
+			lcd_command_write(0x01); //clear screen
+			return 0;
+		}
+
+	}
+
+	eeprom_write_word((uint16_t *) (MODE2) , intervals);
+
+	int i;
+	for(i=0; i<intervals; i++)
+	{
+		clock:
+		lcd_cursor(1,1);
+		lcd_string_write("HRS:min   P2 T");
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,1);
+		lcd_string_write("  :         of  ");
+		lcd_cursor(2,11);
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,15);
+		lcd_number_write(intervals,10);
+
+
+
+		while(1) // setting hrs
+		{
+			temp1=PINA;
+			hr=print_hour(2,1,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				return 0;
+				break;
+			}
+		}
+
+		lcd_cursor(1,1);
+		lcd_string_write("hrs:MIN   P2 T");
+
+		while(1) // setting minutes
+		{
+			temp1=PINA;
+			min=print_minute(2,4,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				goto clock;
+				break;
+			}
+		}
+		eeprom_write_word((uint16_t *) (MODE2+i*2+2) , (hr*100+min));
+		lcd_cursor(2,9);
+//		lcd_number_write((MODE1+i*2),10);
+//		_delay_ms(100);
+		lcd_command_write(0x01); //clear screen
+	}
+
+}
+
+void menu_option_runP0()
+{
+	int i=0; //restart counter
+	int intervals = 0;
+	intervals=eeprom_read_word((uint16_t *) MODE0);	// Load total no. of timings stored in eeprom
+	lcd_cursor(2,14);
+	lcd_string_write("P0");
+
+	while(1)
+	{
+		display_time();
+
+		if((hr==(eeprom_read_word((uint16_t *) (MODE0 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE0 + i*2+2) )%100)))
+		{
+			//  ring_bell_long(1);
+			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(buzzer) and PC3(bell1) will go high
+			_delay_ms(500);
+			PORTC = (PC2<<0)|(PC3<<0);
+			//lcd_command_write(0x01);
+			i++;
+		}
+		if(i>intervals)
+			break;
+		temp1=PINA;
+		if(((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00))
+		{
+			break;
+		}
+	}
+}
+
+void menu_option_runP1()
+{
+	int i=0; //restart counter
+	int intervals = 0;
+	intervals=eeprom_read_word((uint16_t *) MODE1);	// Load total no. of timings stored in eeprom
+	lcd_cursor(2,14);
+	lcd_string_write("P1");
+
+	while(1)
+	{
+		display_time();
+
+		if((hr==(eeprom_read_word((uint16_t *) (MODE1 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE1 + i*2+2) )%100)))
+		{
+			//  ring_bell_long(1);
+			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(buzzer) and PC3(bell1) will go high
+			_delay_ms(500);
+			PORTC = (PC2<<0)|(PC3<<0);
+			//lcd_command_write(0x01);
+			i++;
+		}
+		if(i>intervals)
+			break;
+		temp1=PINA;
+		if(((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00))
+		{
+			break;
+		}
+	}
+}
+
+void menu_option_runP2()
+{
+	int i=0; //restart counter
+	int intervals = 0;
+	intervals = eeprom_read_word((uint16_t *) MODE2);	// Load total no. of timings stored in eeprom
+	lcd_cursor(2,14);
+	lcd_string_write("P2");
+
+	while(1)
+	{
+		display_time();
+
+		if((hr==(eeprom_read_word((uint16_t *) (MODE2 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE2 + i*2+2) )%100)))
+		{
+			//  ring_bell_long(1);
+			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
+			_delay_ms(500);
+			PORTC = (PC2<<0)|(PC3<<0);
+			//lcd_command_write(0x01);
+			i++;
+		}
+		if(i>intervals)
+			break;
+		temp1=PINA;
+		if(((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00))
+		{
+			break;
+		}
+	}
+}
+
+void menu_option_run(const int mode_addr, const int mode)
+{
+	int i=0; //restart counter
+	int intervals = 0;
+	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
+	int break_loop = 0;
+	lcd_cursor(2,15);
+	lcd_string_write("P");
+	lcd_number_write(mode, 10);
+
+	while(1)
+	{
+		display_time();
+
+		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100)))
+		{
+			//  ring_bell_long(1);
+			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
+			_delay_ms(500);
+			PORTC = (PC2<<0)|(PC3<<0);
+			//lcd_command_write(0x01);
+			i++;
+		}
+		if(i>intervals)
+			break;
+		temp1=PINA;
+
+		switch(mode){
+			case 0:
+				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
+				break;
+			case 1:
+				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
+				break;
+			case 2:
+				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
+				break;
+
+		}
+		if(break_loop == 0)
+		{
+			break;
+		}
+	}
+}
 
 void main(void)
 {
 	// variables used in the code
-	int hr, min, min_prev, sec, day, date, month, yr =0;
-		int menu, menu_select, sub_select =0;
-		int a = 0, r, d;
+	//int hr = 0, min = 0, min_prev = 0, sec = 0, day = 0, date = 0, month = 0,
+		int yr =0;
+		int menu = 0, menu_select = 0, sub_select =0;
+		//int a = 0,
 
-		int pause=0;
-		int sw1, sw2, h;
+		int r = 0, d = 0;
+
+		//int pause=0;
+		//int sw1, sw2, h;
 		//int s;
 		int leap[12]={-1,2,3,6,1,4,6,2,5,0,3,5};
 		int nonleap[12]={0,3,3,6,1,4,6,2,5,0,3,5};
@@ -1295,435 +1718,3 @@ void main(void)
 
 	} //while loop
 }//main loop
-
-
-
-int menu_option_resetP0(void)// normal mode to be changed to custom mode
-{
-	//P0
-
-	int intervals;
-
-	lcd_command_write(0x01); //clear screen
-	lcd_cursor(1,1);
-
-	lcd_string_write("No. of timings?");
-	lcd_cursor(2,1);
-
-	while(1)
-	{
-		intervals = print_minute(2,1,0);
-		temp1=PINA;
-
-		if((temp1 & 0x01)!=0x00) // OK button
-		{
-			lcd_command_write(0x01); //clear screen
-			break;
-		}
-
-		if((temp1 & 0x02)!=0x00) // EXIT button
-		{
-			lcd_command_write(0x01); //clear screen
-			return 0;
-		}
-
-	}
-
-	eeprom_write_word((uint16_t *) (MODE0) , intervals);
-
-	int i;
-	for(i=0; i<intervals; i++)
-	{
-		clock:
-		lcd_cursor(1,1);
-		lcd_string_write("HRS:min   P0 T");
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,1);
-		lcd_string_write("  :         of  ");
-		lcd_cursor(2,11);
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,15);
-		lcd_number_write(intervals,10);
-
-
-
-		while(1) // setting hrs
-		{
-			temp1=PINA;
-			hr=print_hour(2,1,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
-			}
-
-			if((temp1 & 0x02)!=0x00) // EXIT button
-			{
-				lcd_command_write(0x01); //clear screen
-				return 0;
-				break;
-			}
-		}
-
-		lcd_cursor(1,1);
-		lcd_string_write("hrs:MIN   P0 T");
-
-		while(1) // setting minutes
-		{
-			temp1=PINA;
-			min=print_minute(2,4,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
-			}
-
-			if((temp1 & 0x02)!=0x00) // EXIT button
-			{
-				lcd_command_write(0x01); //clear screen
-				goto clock;
-				break;
-			}
-		}
-		eeprom_write_word((uint16_t *) (MODE0+i*2+2) , (hr*100+min));
-		lcd_cursor(2,9);
-//		lcd_number_write((MODE1+i*2),10);
-//		_delay_ms(100);
-		lcd_command_write(0x01); //clear screen
-
-	}
-
-}
-
-int menu_option_resetP1(void)// normal mode to be changed to custom mode
-{
-	//P0
-
-	int intervals;
-
-	lcd_command_write(0x01); //clear screen
-	lcd_cursor(1,1);
-
-	lcd_string_write("No. of timings?");
-	lcd_cursor(2,1);
-
-	while(1)
-	{
-		intervals = print_minute(2,1,0);
-		temp1=PINA;
-
-		if((temp1 & 0x01)!=0x00) // OK button
-		{
-			lcd_command_write(0x01); //clear screen
-			break;
-		}
-
-		if((temp1 & 0x02)!=0x00) // EXIT button
-		{
-			lcd_command_write(0x01); //clear screen
-			return 0;
-		}
-
-	}
-
-	eeprom_write_word((uint16_t *) (MODE1) , intervals);
-
-	int i;
-	for(i=0; i<intervals; i++)
-	{
-		clock:
-		lcd_cursor(1,1);
-		lcd_string_write("HRS:min   P1 T");
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,1);
-		lcd_string_write("  :         of  ");
-		lcd_cursor(2,11);
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,15);
-		lcd_number_write(intervals,10);
-
-
-
-		while(1) // setting hrs
-		{
-			temp1=PINA;
-			hr=print_hour(2,1,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
-			}
-
-			if((temp1 & 0x02)!=0x00) // EXIT button
-			{
-				lcd_command_write(0x01); //clear screen
-				return 0;
-				break;
-			}
-		}
-
-		lcd_cursor(1,1);
-		lcd_string_write("hrs:MIN   P1 T");
-
-		while(1) // setting minutes
-		{
-			temp1=PINA;
-			min=print_minute(2,4,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
-			}
-
-			if((temp1 & 0x02)!=0x00) // EXIT button
-			{
-				lcd_command_write(0x01); //clear screen
-				goto clock;
-				break;
-			}
-		}
-		eeprom_write_word((uint16_t *) (MODE1+i*2+2) , (hr*100+min));
-		lcd_cursor(2,9);
-//		lcd_number_write((MODE1+i*2),10);
-//		_delay_ms(100);
-		lcd_command_write(0x01); //clear screen
-
-	}
-
-}
-
-int menu_option_resetP2(void)// normal mode to be changed to custom mode
-{
-	//P0
-
-	int intervals;
-
-	lcd_command_write(0x01); //clear screen
-	lcd_cursor(1,1);
-
-	lcd_string_write("No. of alarms?");
-	lcd_cursor(2,1);
-
-	while(1)
-	{
-		intervals = print_minute(2,1,0);
-		temp1=PINA;
-
-		if((temp1 & 0x01)!=0x00) // OK button
-		{
-			lcd_command_write(0x01); //clear screen
-			break;
-		}
-
-		if((temp1 & 0x02)!=0x00) // EXIT button
-		{
-			lcd_command_write(0x01); //clear screen
-			return 0;
-		}
-
-	}
-
-	eeprom_write_word((uint16_t *) (MODE2) , intervals);
-
-	int i;
-	for(i=0; i<intervals; i++)
-	{
-		clock:
-		lcd_cursor(1,1);
-		lcd_string_write("HRS:min   P2 T");
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,1);
-		lcd_string_write("  :         of  ");
-		lcd_cursor(2,11);
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,15);
-		lcd_number_write(intervals,10);
-
-
-
-		while(1) // setting hrs
-		{
-			temp1=PINA;
-			hr=print_hour(2,1,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
-			}
-
-			if((temp1 & 0x02)!=0x00) // EXIT button
-			{
-				lcd_command_write(0x01); //clear screen
-				return 0;
-				break;
-			}
-		}
-
-		lcd_cursor(1,1);
-		lcd_string_write("hrs:MIN   P2 T");
-
-		while(1) // setting minutes
-		{
-			temp1=PINA;
-			min=print_minute(2,4,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
-			}
-
-			if((temp1 & 0x02)!=0x00) // EXIT button
-			{
-				lcd_command_write(0x01); //clear screen
-				goto clock;
-				break;
-			}
-		}
-		eeprom_write_word((uint16_t *) (MODE2+i*2+2) , (hr*100+min));
-		lcd_cursor(2,9);
-//		lcd_number_write((MODE1+i*2),10);
-//		_delay_ms(100);
-		lcd_command_write(0x01); //clear screen
-	}
-
-}
-
-void menu_option_runP0(void)
-{
-	int i=0; //restart counter
-	int intervals = 0;
-	intervals=eeprom_read_word((uint16_t *) MODE0);	// Load total no. of timings stored in eeprom
-	lcd_cursor(2,14);
-	lcd_string_write("P0");
-
-	while(1)
-	{
-		display_time();
-
-		if((hr==(eeprom_read_word((uint16_t *) (MODE0 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE0 + i*2+2) )%100)))
-		{
-			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(buzzer) and PC3(bell1) will go high
-			_delay_ms(500);
-			PORTC = (PC2<<0)|(PC3<<0);
-			//lcd_command_write(0x01);
-			i++;
-		}
-		if(i>intervals)
-			break;
-		temp1=PINA;
-		if(((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00))
-		{
-			break;
-		}
-	}
-}
-
-void menu_option_runP1(void)
-{
-	int i=0; //restart counter
-	int intervals = 0;
-	intervals=eeprom_read_word((uint16_t *) MODE1);	// Load total no. of timings stored in eeprom
-	lcd_cursor(2,14);
-	lcd_string_write("P1");
-
-	while(1)
-	{
-		display_time();
-
-		if((hr==(eeprom_read_word((uint16_t *) (MODE1 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE1 + i*2+2) )%100)))
-		{
-			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1); //Pins PC2(buzzer) and PC3(bell1) will go high
-			_delay_ms(500);
-			PORTC = (PC2<<0)|(PC3<<0);
-			//lcd_command_write(0x01);
-			i++;
-		}
-		if(i>intervals)
-			break;
-		temp1=PINA;
-		if(((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00))
-		{
-			break;
-		}
-	}
-}
-
-void menu_option_runP2(void)
-{
-	int i=0; //restart counter
-	int intervals = 0;
-	intervals = eeprom_read_word((uint16_t *) MODE2);	// Load total no. of timings stored in eeprom
-	lcd_cursor(2,14);
-	lcd_string_write("P2");
-
-	while(1)
-	{
-		display_time();
-
-		if((hr==(eeprom_read_word((uint16_t *) (MODE2 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE2 + i*2+2) )%100)))
-		{
-			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
-			_delay_ms(500);
-			PORTC = (PC2<<0)|(PC3<<0);
-			//lcd_command_write(0x01);
-			i++;
-		}
-		if(i>intervals)
-			break;
-		temp1=PINA;
-		if(((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00))
-		{
-			break;
-		}
-	}
-}
-
-void menu_option_run(const int mode_addr, const int mode)
-{
-	int i=0; //restart counter
-	int intervals = 0;
-	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
-	int break_loop = 0;
-	lcd_cursor(2,15);
-	lcd_string_write("P");
-	lcd_number_write(mode, 10);
-
-	while(1)
-	{
-		display_time();
-
-		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100)))
-		{
-			//  ring_bell_long(1);
-			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
-			_delay_ms(500);
-			PORTC = (PC2<<0)|(PC3<<0);
-			//lcd_command_write(0x01);
-			i++;
-		}
-		if(i>intervals)
-			break;
-		temp1=PINA;
-
-		switch(mode){
-			case 0:
-				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
-				break;
-			case 1:
-				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
-				break;
-			case 2:
-				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
-				break;
-
-		}
-		if(break_loop == 0)
-		{
-			break;
-		}
-	}
-}
-
