@@ -782,7 +782,12 @@ void main(void)
 									{
 										int i=0,i_prev=0;
 										int  intervals = eeprom_read_word(MODE0);
-
+										if(intervals == -1){
+											lcd_cursor(1,1);
+											lcd_command_write(0x01); //clear screen
+											lcd_string_write(" No Timings Set ");
+											_delay_ms(50);
+										} else {
 									P0_modify:
 
 										lcd_cursor(2,1);
@@ -894,6 +899,7 @@ void main(void)
 
 
 											}
+									}
 								}
 
 								//ending codes to go back to menu
@@ -950,11 +956,17 @@ void main(void)
 									goto menu;
 									break;
 								}
+
 								if(sub_select==1) //editting selected timings
 								{
 									int i=0,i_prev=0;
 									int  intervals = eeprom_read_word(MODE1);
-
+									if(intervals == -1){
+										lcd_cursor(1,1);
+										lcd_command_write(0x01); //clear screen
+										lcd_string_write(" No Timings Set ");
+										_delay_ms(50);
+									} else {
 								P1_modify:
 
 									lcd_cursor(2,1);
@@ -966,11 +978,13 @@ void main(void)
 											i=0;
 										if(i>(intervals-1))
 											i=intervals-1;
+										/*
 										if(i-i_prev !=0)
 										{
-										lcd_cursor(2,1);
-										lcd_string_write("  :         of  ");
+											lcd_cursor(2,1);
+											lcd_string_write("  :         of  ");
 										}
+										*/
 										lcd_cursor(1,1);
 										lcd_string_write("HRS:MIN   P1 T");
 										lcd_number_write(i+1,10);
@@ -1065,6 +1079,7 @@ void main(void)
 
 
 										}
+								}
 							}
 
 							//ending codes to go back to menu
@@ -1123,7 +1138,12 @@ void main(void)
 								{
 									int i=0,i_prev=0;
 									int  intervals = eeprom_read_word(MODE2);
-
+									if(intervals == -1){
+										lcd_cursor(1,1);
+										lcd_command_write(0x01); //clear screen
+										lcd_string_write(" No Alarms Set ");
+										_delay_ms(50);
+									} else {
 								P2_modify:
 
 									lcd_cursor(2,1);
@@ -1135,11 +1155,13 @@ void main(void)
 											i=0;
 										if(i>(intervals-1))
 											i=intervals-1;
+										/*
 										if(i-i_prev !=0)
 										{
 										lcd_cursor(2,1);
 										lcd_string_write("  :         of  ");
 										}
+										*/
 										lcd_cursor(1,1);
 										lcd_string_write("HRS:MIN   P2 T");
 										lcd_number_write(i+1,10);
@@ -1235,6 +1257,7 @@ void main(void)
 
 
 										}
+								}
 							}
 
 							//ending codes to go back to menu
