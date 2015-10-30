@@ -190,7 +190,7 @@ twi_send_stop();
 
 void ds1307_year_write(unsigned char year)
 {
-unsigned char twi_status;
+unsigned char twi_status = 0;
 twi_send_start();
 twi_status=twi_send_address_rw(0xd0);
 twi_status=twi_master_send_data(0x06);
