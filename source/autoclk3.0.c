@@ -780,7 +780,7 @@ void main(void)
 									}
 									if(sub_select==1) //editting selected timings
 									{
-										int i,i_prev;
+										int i=0,i_prev=0;
 										int  intervals = eeprom_read_word(MODE0);
 
 									P0_modify:
@@ -794,11 +794,13 @@ void main(void)
 												i=0;
 											if(i>(intervals-1))
 												i=intervals-1;
+											/*
 											if(i-i_prev !=0)
 											{
 												lcd_cursor(2,1);
 												lcd_string_write("  :         of  ");
 											}
+											*/
 											lcd_cursor(1,1);
 											lcd_string_write("HRS:MIN   P0 T");
 											lcd_number_write(i+1,10);
@@ -869,12 +871,11 @@ void main(void)
 													min=print_minute(2,4,0);
 													if((temp1 & 0x01)!=0x00) // OK button
 													{
-
 														break;
 													}
 													if((temp1 & 0x02)!=0x00) // EXIT button
 													{
-														lcd_command_write(0x01); //clear screen
+														//lcd_command_write(0x01); //clear screen
 														goto P0_set;
 														break;
 													}
@@ -1261,15 +1262,15 @@ void main(void)
 			// else { // RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
 				if((temp1 & 0x10)!=0x00)
 				{
-					menu_option_run(MODE1, 1);
+					menu_option_runP1();
 				}
 				if((temp1 & 0x20)!=0x00)
 				{
-					menu_option_run(MODE2, 2);
+					menu_option_runP2();
 				}
 				if(((temp1 & 0x10)==0x00) && ((temp1 & 0x20)==0x00))
 				{
-					menu_option_run(MODE0, 0);
+					menu_option_runP0();
 				}
 				//bell_H(h);
 				//bell_S(s);
@@ -1570,7 +1571,6 @@ int menu_option_P2(void)// normal mode to be changed to custom mode
 
 }
 
-/*
 void menu_option_runP0(void)
 {
 	int i=0; //restart counter
@@ -1664,7 +1664,6 @@ void menu_option_runP2(void)
 		}
 	}
 }
-*/
 
 void menu_option_run(const int mode_addr, const int mode)
 {
@@ -1679,6 +1678,7 @@ void menu_option_run(const int mode_addr, const int mode)
 		lcd_cursor(2,15);
 		lcd_string_write("P");
 		lcd_number_write(mode, 10);
+
 		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100)))
 		{
 			//  ring_bell_long(1);
