@@ -190,9 +190,7 @@ void display_time(void) {
 						lcd_string_write("0");
 						lcd_cursor(1,4);
 						lcd_number_write(date,10);
-					}
-	if(date>9)
-					{
+					} else {
 						lcd_cursor(1,3);
 						lcd_number_write(date,10);
 					}
@@ -202,9 +200,7 @@ void display_time(void) {
 					lcd_string_write("0");
 					lcd_cursor(1,7);
 					lcd_number_write(month,10);
-				}
-	if(month>9)
-					{
+				} else {
 						lcd_cursor(1,6);
 						lcd_number_write(month,10);
 					}
@@ -214,9 +210,7 @@ void display_time(void) {
 						lcd_string_write("0");
 						lcd_cursor(1,10);
 						lcd_number_write(year,10);
-					}
-	if(year>9)
-					{
+					} else {
 						lcd_cursor(1,9);
 						lcd_number_write(year,10);
 					}
@@ -235,37 +229,37 @@ void display_time(void) {
 						lcd_string_write("0");
 						lcd_cursor(2,4);
 						lcd_number_write(hr,10);
-					}
-	if(hr>9)
-					{
+					} else {
 						lcd_cursor(2,3);
 						lcd_number_write(hr,10);
 					}
+
 	if(min<=9)
-				{
-					lcd_cursor(2,6);
-					lcd_string_write("0");
-					lcd_cursor(2,7);
-					lcd_number_write(min,10);
-				}
-	if(min>9)
-		{
-			lcd_cursor(2,6);
-			lcd_number_write(min,10);
-		}
+					{
+						lcd_cursor(2,6);
+						lcd_string_write("0");
+						lcd_cursor(2,7);
+						lcd_number_write(min,10);
+					} else {
+						lcd_cursor(2,6);
+						lcd_number_write(min,10);
+					}
 
 	if(sec<=9)
-			{
-				lcd_cursor(2,9);
-				lcd_string_write("0");
-				lcd_cursor(2,10);
-				lcd_number_write(sec,10);
-			}
-	if(sec>9)
-		{
-			lcd_cursor(2,9);
-			lcd_number_write(sec,10);
-		}
+					{
+						lcd_cursor(2,9);
+						lcd_string_write("0");
+						lcd_cursor(2,10);
+						lcd_number_write(sec,10);
+					} else {
+						lcd_cursor(2,9);
+						lcd_number_write(sec,10);
+					}
+
+
+}
+
+void display_date_time_format(){
 	lcd_cursor(1,5);
 	lcd_string_write("/");
 	lcd_cursor(1,8);
@@ -274,7 +268,6 @@ void display_time(void) {
 	lcd_string_write(":");
 	lcd_cursor(2,8);
 	lcd_string_write(":");
-
 }
 
 //adc to set time of the clock
@@ -774,7 +767,7 @@ void main(void)
 									if(sub_select==2) //resetting the eeprom
 									{
 										lcd_command_write(0x01); //clear screen
-										menu_option_P0();
+										menu_option_resetP0();
 										goto menu;
 										break;
 									}
@@ -952,7 +945,7 @@ void main(void)
 								if(sub_select==2) //resetting the eeprom
 								{
 									lcd_command_write(0x01); //clear screen
-									menu_option_P1();
+									menu_option_resetP1();
 									goto menu;
 									break;
 								}
@@ -1130,7 +1123,7 @@ void main(void)
 								if(sub_select==2) //resetting the eeprom
 								{
 									lcd_command_write(0x01); //clear screen
-									menu_option_P2();
+									menu_option_resetP2();
 									goto menu;
 									break;
 								}
@@ -1283,6 +1276,7 @@ void main(void)
 			}
 			}
 			// else { // RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
+				display_date_time_format();
 				if((temp1 & 0x10)!=0x00)
 				{
 					menu_option_runP1();
@@ -1304,7 +1298,7 @@ void main(void)
 
 
 
-int menu_option_P0(void)// normal mode to be changed to custom mode
+int menu_option_resetP0(void)// normal mode to be changed to custom mode
 {
 	//P0
 
@@ -1401,7 +1395,7 @@ int menu_option_P0(void)// normal mode to be changed to custom mode
 
 }
 
-int menu_option_P1(void)// normal mode to be changed to custom mode
+int menu_option_resetP1(void)// normal mode to be changed to custom mode
 {
 	//P0
 
@@ -1498,7 +1492,7 @@ int menu_option_P1(void)// normal mode to be changed to custom mode
 
 }
 
-int menu_option_P2(void)// normal mode to be changed to custom mode
+int menu_option_resetP2(void)// normal mode to be changed to custom mode
 {
 	//P0
 
@@ -1599,13 +1593,12 @@ void menu_option_runP0(void)
 	int i=0; //restart counter
 	int intervals = 0;
 	intervals=eeprom_read_word((uint16_t *) MODE0);	// Load total no. of timings stored in eeprom
+	lcd_cursor(2,14);
+	lcd_string_write("P0");
 
 	while(1)
 	{
 		display_time();
-
-		lcd_cursor(2,14);
-		lcd_string_write("P0");
 
 		if((hr==(eeprom_read_word((uint16_t *) (MODE0 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE0 + i*2+2) )%100)))
 		{
@@ -1631,12 +1624,12 @@ void menu_option_runP1(void)
 	int i=0; //restart counter
 	int intervals = 0;
 	intervals=eeprom_read_word((uint16_t *) MODE1);	// Load total no. of timings stored in eeprom
+	lcd_cursor(2,14);
+	lcd_string_write("P1");
 
 	while(1)
 	{
 		display_time();
-		lcd_cursor(2,14);
-		lcd_string_write("P1");
 
 		if((hr==(eeprom_read_word((uint16_t *) (MODE1 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE1 + i*2+2) )%100)))
 		{
@@ -1662,12 +1655,12 @@ void menu_option_runP2(void)
 	int i=0; //restart counter
 	int intervals = 0;
 	intervals = eeprom_read_word((uint16_t *) MODE2);	// Load total no. of timings stored in eeprom
+	lcd_cursor(2,14);
+	lcd_string_write("P2");
 
 	while(1)
 	{
 		display_time();
-		lcd_cursor(2,14);
-		lcd_string_write("P2");
 
 		if((hr==(eeprom_read_word((uint16_t *) (MODE2 + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (MODE2 + i*2+2) )%100)))
 		{
@@ -1694,13 +1687,13 @@ void menu_option_run(const int mode_addr, const int mode)
 	int intervals = 0;
 	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
 	int break_loop = 0;
+	lcd_cursor(2,15);
+	lcd_string_write("P");
+	lcd_number_write(mode, 10);
 
 	while(1)
 	{
 		display_time();
-		lcd_cursor(2,15);
-		lcd_string_write("P");
-		lcd_number_write(mode, 10);
 
 		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100)))
 		{
