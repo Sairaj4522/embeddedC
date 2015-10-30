@@ -952,7 +952,7 @@ void main(void)
 								}
 								if(sub_select==1) //editting selected timings
 								{
-									int i,i_prev;
+									int i=0,i_prev=0;
 									int  intervals = eeprom_read_word(MODE1);
 
 								P1_modify:
@@ -1046,7 +1046,7 @@ void main(void)
 												}
 												if((temp1 & 0x02)!=0x00) // EXIT button
 												{
-													lcd_command_write(0x01); //clear screen
+													//lcd_command_write(0x01); //clear screen
 													goto P1_set;
 													break;
 												}
@@ -1121,7 +1121,7 @@ void main(void)
 								}
 								if(sub_select==1) //editting selected timings
 								{
-									int i,i_prev;
+									int i=0,i_prev=0;
 									int  intervals = eeprom_read_word(MODE2);
 
 								P2_modify:
@@ -1216,7 +1216,7 @@ void main(void)
 												}
 												if((temp1 & 0x02)!=0x00) // EXIT button
 												{
-													lcd_command_write(0x01); //clear screen
+													//lcd_command_write(0x01); //clear screen
 													goto P2_set;
 													break;
 												}
