@@ -837,6 +837,7 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 
 }
 
+/*
 void menu_option_runP0()
 {
 	int i=0; //restart counter
@@ -929,23 +930,34 @@ void menu_option_runP2()
 		}
 	}
 }
+*/
 
-void menu_option_run(const int mode_addr, const int mode)
-{
+void menu_option_run(const int mode_addr){
 	int i=0; //restart counter
 	int intervals = 0;
 	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
 	int break_loop = 0;
+
 	lcd_cursor(2,15);
 	lcd_string_write("P");
-	lcd_number_write(mode, 10);
+
+	switch(mode_addr){
+		case MODE0:
+			lcd_number_write(0, 10);
+			break;
+		case MODE1:
+			lcd_number_write(1, 10);
+			break;
+		case MODE2:
+			lcd_number_write(2, 10);
+			break;
+	}
 
 	while(1)
 	{
 		display_time();
 
-		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100)))
-		{
+		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100))){
 			//  ring_bell_long(1);
 			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
 			_delay_ms(500);
@@ -957,26 +969,25 @@ void menu_option_run(const int mode_addr, const int mode)
 			break;
 		temp1=PINA;
 
-		switch(mode){
-			case 0:
+		switch(mode_addr){
+			case MODE0:
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
 				break;
-			case 1:
+			case MODE1:
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
 				break;
-			case 2:
+			case MODE2:
 				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
 				break;
 
 		}
-		if(break_loop == 0)
-		{
+		if(break_loop == 1){
 			break;
 		}
 	}
 }
 
-void main(void)
+int main()
 {
 	// variables used in the code
 	//int hr = 0, min = 0, min_prev = 0, sec = 0, day = 0, date = 0, month = 0,
@@ -1836,19 +1847,21 @@ void main(void)
 				display_date_time_format();	// draw / / for date and : : for time on LCD
 				if((temp1 & 0x10)!=0x00)
 				{
-					menu_option_runP1();
+					menu_option_run(MODE1);
 				}
 				if((temp1 & 0x20)!=0x00)
 				{
-					menu_option_runP2();
+					menu_option_run(MODE2);
 				}
 				if(((temp1 & 0x10)==0x00) && ((temp1 & 0x20)==0x00))
 				{
-					menu_option_runP0();
+					menu_option_run(MODE0);
 				}
 				//bell_H(h);
 				//bell_S(s);
 		//	}
 
 	} //while loop
+
+	return 0;
 }//main loop
