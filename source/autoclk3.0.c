@@ -141,126 +141,7 @@ char *display_format[] = {
 // global declaration
 unsigned char date, month, year, hr, min, sec;
 
-//Function to display date and time on the LCD
 
-void display_time(void) {
-	char *weekdays[] = {
-	                    "SUN",
-	                    "MON",
-						"TUE",
-	                    "WED",
-						"THU",
-	                    "FRI",
-	                    "SAT",
-	    	       	   };
-	//unsigned char second_byte = 0,minute_byte = 0,hour_byte = 0;
-	int day1 = 0;
-	//unsigned char day = 0;
-
-	//unsigned char prev_sec = 0,prev_hour_byte = 0;
-
-	//hour_byte = ds1307_read_hour();            // read hour regiter and store
-	//hour_byte = hour_calculation(hour_byte);// call for mode display
-	hr=convert_bcd_to_decimal(ds1307_read_hour());
-	//minute_byte = ds1307_read_minute();       // read minute regiter and store
-	min=convert_bcd_to_decimal(ds1307_read_minute());
-	//second_byte = ds1307_read_second();        // read seconds regiter and store
-	sec = convert_bcd_to_decimal(ds1307_read_second());
-
-	day1=convert_bcd_to_decimal(ds1307_read_day());
-	date=convert_bcd_to_decimal(ds1307_read_date());
-	month=convert_bcd_to_decimal(ds1307_read_month());
-	year=convert_bcd_to_decimal(ds1307_read_year());
-
-
-
-
-	//displaying style
-	if(date<=9)
-					{
-						lcd_cursor(1,3);
-						lcd_string_write("0");
-						lcd_cursor(1,4);
-						lcd_number_write(date,10);
-					} else {
-						lcd_cursor(1,3);
-						lcd_number_write(date,10);
-					}
-	if(month<=9)
-				{
-					lcd_cursor(1,6);
-					lcd_string_write("0");
-					lcd_cursor(1,7);
-					lcd_number_write(month,10);
-				} else {
-						lcd_cursor(1,6);
-						lcd_number_write(month,10);
-					}
-	if(year<=9)
-					{
-						lcd_cursor(1,9);
-						lcd_string_write("0");
-						lcd_cursor(1,10);
-						lcd_number_write(year,10);
-					} else {
-						lcd_cursor(1,9);
-						lcd_number_write(year,10);
-					}
-
-
-	lcd_cursor(1,13);
-	//day=weekdays[day1-1];
-	//lcd_number_write(day1,10);
-	lcd_string_write(weekdays[day1-1]);
-	//lcd_data_write(day);
-
-    // displaying style
-	if(hr<=9)
-					{
-						lcd_cursor(2,3);
-						lcd_string_write("0");
-						lcd_cursor(2,4);
-						lcd_number_write(hr,10);
-					} else {
-						lcd_cursor(2,3);
-						lcd_number_write(hr,10);
-					}
-
-	if(min<=9)
-					{
-						lcd_cursor(2,6);
-						lcd_string_write("0");
-						lcd_cursor(2,7);
-						lcd_number_write(min,10);
-					} else {
-						lcd_cursor(2,6);
-						lcd_number_write(min,10);
-					}
-
-	if(sec<=9)
-					{
-						lcd_cursor(2,9);
-						lcd_string_write("0");
-						lcd_cursor(2,10);
-						lcd_number_write(sec,10);
-					} else {
-						lcd_cursor(2,9);
-						lcd_number_write(sec,10);
-					}
-
-
-}
-
-void display_date_time_format(){
-	lcd_cursor(1,5);
-	lcd_string_write("/");
-	lcd_cursor(1,8);
-	lcd_string_write("/");
-	lcd_cursor(2,5);
-	lcd_string_write(":");
-	lcd_cursor(2,8);
-	lcd_string_write(":");
-}
 
 //adc to set time of the clock
 //unsigned char ADC_Conversion(unsigned char);
@@ -413,6 +294,126 @@ int print_month(char row, char coloumn,unsigned char channel) {
 		   return 12;
 }
 
+//Function to display date and time on the LCD
+
+void display_time(void) {
+	char *weekdays[] = {
+	                    "SUN",
+	                    "MON",
+						"TUE",
+	                    "WED",
+						"THU",
+	                    "FRI",
+	                    "SAT",
+	    	       	   };
+	//unsigned char second_byte = 0,minute_byte = 0,hour_byte = 0;
+	int day1 = 0;
+	//unsigned char day = 0;
+
+	//unsigned char prev_sec = 0,prev_hour_byte = 0;
+
+	//hour_byte = ds1307_read_hour();            // read hour regiter and store
+	//hour_byte = hour_calculation(hour_byte);// call for mode display
+	hr=convert_bcd_to_decimal(ds1307_read_hour());
+	//minute_byte = ds1307_read_minute();       // read minute regiter and store
+	min=convert_bcd_to_decimal(ds1307_read_minute());
+	//second_byte = ds1307_read_second();        // read seconds regiter and store
+	sec = convert_bcd_to_decimal(ds1307_read_second());
+
+	day1=convert_bcd_to_decimal(ds1307_read_day());
+	date=convert_bcd_to_decimal(ds1307_read_date());
+	month=convert_bcd_to_decimal(ds1307_read_month());
+	year=convert_bcd_to_decimal(ds1307_read_year());
+
+
+
+
+	//displaying style
+	if(date<=9)
+					{
+						lcd_cursor(1,3);
+						lcd_string_write("0");
+						lcd_cursor(1,4);
+						lcd_number_write(date,10);
+					} else {
+						lcd_cursor(1,3);
+						lcd_number_write(date,10);
+					}
+	if(month<=9)
+				{
+					lcd_cursor(1,6);
+					lcd_string_write("0");
+					lcd_cursor(1,7);
+					lcd_number_write(month,10);
+				} else {
+						lcd_cursor(1,6);
+						lcd_number_write(month,10);
+					}
+	if(year<=9)
+					{
+						lcd_cursor(1,9);
+						lcd_string_write("0");
+						lcd_cursor(1,10);
+						lcd_number_write(year,10);
+					} else {
+						lcd_cursor(1,9);
+						lcd_number_write(year,10);
+					}
+
+
+	lcd_cursor(1,13);
+	//day=weekdays[day1-1];
+	//lcd_number_write(day1,10);
+	lcd_string_write(weekdays[day1-1]);
+	//lcd_data_write(day);
+
+    // displaying style
+	if(hr<=9)
+					{
+						lcd_cursor(2,3);
+						lcd_string_write("0");
+						lcd_cursor(2,4);
+						lcd_number_write(hr,10);
+					} else {
+						lcd_cursor(2,3);
+						lcd_number_write(hr,10);
+					}
+
+	if(min<=9)
+					{
+						lcd_cursor(2,6);
+						lcd_string_write("0");
+						lcd_cursor(2,7);
+						lcd_number_write(min,10);
+					} else {
+						lcd_cursor(2,6);
+						lcd_number_write(min,10);
+					}
+
+	if(sec<=9)
+					{
+						lcd_cursor(2,9);
+						lcd_string_write("0");
+						lcd_cursor(2,10);
+						lcd_number_write(sec,10);
+					} else {
+						lcd_cursor(2,9);
+						lcd_number_write(sec,10);
+					}
+
+
+}
+
+void display_date_time_format(){
+	lcd_cursor(1,5);
+	lcd_string_write("/");
+	lcd_cursor(1,8);
+	lcd_string_write("/");
+	lcd_cursor(2,5);
+	lcd_string_write(":");
+	lcd_cursor(2,8);
+	lcd_string_write(":");
+}
 
 int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MODE2
 {
@@ -545,8 +546,6 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 	}
 
 }
-
-
 
 void menu_option_run(const int mode_addr){
 	int i=0; //restart counter
@@ -1480,4 +1479,4 @@ int main()
 	} //while loop
 
 	return 0;
-}//main loop
+}//main function
