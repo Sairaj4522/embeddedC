@@ -412,6 +412,7 @@ int print_month(char row, char coloumn,unsigned char channel) {
 		if(ADC_Value >11)
 		   return 12;
 }
+/*
 
 int menu_option_resetP0()// normal mode to be changed to custom mode
 {
@@ -512,7 +513,7 @@ int menu_option_resetP0()// normal mode to be changed to custom mode
 
 int menu_option_resetP1()// normal mode to be changed to custom mode
 {
-	//P0
+	//P1
 
 	int intervals;
 
@@ -609,7 +610,7 @@ int menu_option_resetP1()// normal mode to be changed to custom mode
 
 int menu_option_resetP2()// normal mode to be changed to custom mode
 {
-	//P0
+	//P2
 
 	int intervals;
 
@@ -697,6 +698,139 @@ int menu_option_resetP2()// normal mode to be changed to custom mode
 		eeprom_write_word((uint16_t *) (MODE2+i*2+2) , (hr*100+min));
 		lcd_cursor(2,9);
 //		lcd_number_write((MODE1+i*2),10);
+//		_delay_ms(100);
+		lcd_command_write(0x01); //clear screen
+	}
+
+}
+*/
+
+int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MODE2
+{
+	int intervals;
+
+	lcd_command_write(0x01); //clear screen
+	lcd_cursor(1,1);
+
+	switch(mode_addr){
+		case MODE0:
+		case MODE1:
+			lcd_string_write("No. of Timings?");
+			break;
+		case MODE2:
+			lcd_string_write("No. of Alarms?");
+			break;
+	}
+
+	lcd_cursor(2,1);
+
+	while(1)
+	{
+		intervals = print_minute(2,1,0);
+		temp1=PINA;
+
+		if((temp1 & 0x01)!=0x00) // OK button
+		{
+			lcd_command_write(0x01); //clear screen
+			break;
+		}
+
+		if((temp1 & 0x02)!=0x00) // EXIT button
+		{
+			lcd_command_write(0x01); //clear screen
+			return 0;
+		}
+
+	}
+
+	eeprom_write_word((uint16_t *) (mode_addr) , intervals);
+
+	int i;
+	for(i=0; i<intervals; i++)
+	{
+		clock:
+		lcd_cursor(1,1);
+		lcd_string_write("HRS:min   P");
+
+		switch(mode_addr){
+			case MODE0:
+				lcd_number_write(0,10);
+				break;
+			case MODE1:
+				lcd_number_write(1,10);
+				break;
+			case MODE2:
+				lcd_number_write(2,10);
+				break;
+		}
+
+		lcd_string_write(" T");
+
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,1);
+		lcd_string_write("  :         of  ");
+		lcd_cursor(2,11);
+		lcd_number_write(i+1,10);
+		lcd_cursor(2,15);
+		lcd_number_write(intervals,10);
+
+
+
+		while(1) // setting hrs
+		{
+			temp1=PINA;
+			hr=print_hour(2,1,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				return 0;
+				break;
+			}
+		}
+
+		lcd_cursor(1,1);
+		lcd_string_write("hrs:MIN   P");
+
+				switch(mode_addr){
+					case MODE0:
+						lcd_number_write(0,10);
+						break;
+					case MODE1:
+						lcd_number_write(1,10);
+						break;
+					case MODE2:
+						lcd_number_write(2,10);
+						break;
+				}
+				lcd_string_write(" T");
+
+
+		while(1) // setting minutes
+		{
+			temp1=PINA;
+			min=print_minute(2,4,0);
+
+			if((temp1 & 0x01)!=0x00) // OK button
+			{
+				break;
+			}
+
+			if((temp1 & 0x02)!=0x00) // EXIT button
+			{
+				lcd_command_write(0x01); //clear screen
+				goto clock;
+				break;
+			}
+		}
+		eeprom_write_word((uint16_t *) (mode_addr+i*2+2) , (hr*100+min));
+		lcd_cursor(2,9);
+//		lcd_number_write((mode_addr+i*2),10);
 //		_delay_ms(100);
 		lcd_command_write(0x01); //clear screen
 	}
@@ -1190,7 +1324,7 @@ void main(void)
 									if(sub_select==2) //resetting the eeprom
 									{
 										lcd_command_write(0x01); //clear screen
-										menu_option_resetP0();
+										menu_option_reset(MODE0);
 										goto menu;
 										break;
 									}
@@ -1225,8 +1359,8 @@ void main(void)
 											lcd_cursor(1,1);
 											lcd_string_write("HRS:MIN   P0 T");
 											lcd_number_write(i+1,10);
-											lcd_cursor(1,16);
-											lcd_string_write(" ");
+											//lcd_cursor(1,16);
+											//lcd_string_write(" ");
 											if((eeprom_read_word(MODE0+i*2+2)/100) <= 9)
 											{
 												lcd_cursor(2,1);
@@ -1368,7 +1502,7 @@ void main(void)
 								if(sub_select==2) //resetting the eeprom
 								{
 									lcd_command_write(0x01); //clear screen
-									menu_option_resetP1();
+									menu_option_reset(MODE1);
 									goto menu;
 									break;
 								}
@@ -1546,7 +1680,7 @@ void main(void)
 								if(sub_select==2) //resetting the eeprom
 								{
 									lcd_command_write(0x01); //clear screen
-									menu_option_resetP2();
+									menu_option_reset(MODE2);
 									goto menu;
 									break;
 								}
@@ -1699,7 +1833,7 @@ void main(void)
 			}
 			}
 			// else { // RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
-				display_date_time_format();
+				display_date_time_format();	// draw / / for date and : : for time on LCD
 				if((temp1 & 0x10)!=0x00)
 				{
 					menu_option_runP1();
