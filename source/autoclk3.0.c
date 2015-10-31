@@ -452,7 +452,7 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 		}
 
 	}
-
+	if(intervals > 0){
 	eeprom_write_word((uint16_t *) (mode_addr) , intervals);
 
 	int i;
@@ -544,7 +544,7 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 //		_delay_ms(100);
 		lcd_command_write(0x01); //clear screen
 	}
-
+	}
 }
 
 void menu_option_run(const int mode_addr){
@@ -1480,3 +1480,8 @@ int main()
 
 	return 0;
 }//main function
+
+//TODO Extract code out of main function to create a new function for modify feature,
+// function name would be menu_option_modify()
+
+//TODO add feature to set different bell durations
