@@ -124,24 +124,10 @@
 #define MODE1 170
 #define MODE2 340
 
-//int h1=0;
-//int h0=0;
-//int s0=0;
 unsigned char temp1;
-/*char *ampm_bit[] = {
-                    "AM",
-					"PM",
-					};
-
-char *display_format[] = {
-					      "  :  :  ",
-                          "  /  /  ",
-		       	         };*/
 
 // global declaration
 unsigned char date, month, year, hr, min, sec;
-
-
 
 //adc to set time of the clock
 //unsigned char ADC_Conversion(unsigned char);
@@ -154,7 +140,6 @@ void adc_init() {
 	ACSR = 0x80;
 	ADCSRA = 0x86;		            //ADEN=1 --- ADIE=1 --- ADPS2:0 = 1 1 0
 }
-
 
 //This Function returns the corresponding Analog Value
 
@@ -172,193 +157,170 @@ uint8_t ReadVoltage(void)
 int print_hour(char row, char coloumn,unsigned char channel) {
 	ADC_Value = ReadVoltage();
 	ADC_Value = (ADC_Value*24) / 255;
-	//lcd_print(row, coloumn, ADC_Value, 2);
 
-	if(ADC_Value <= 23)
-	{
-		if(ADC_Value<=9)
-					{
-						lcd_cursor(row,coloumn);
-						lcd_string_write("0");
-						lcd_cursor(row,coloumn+1);
-						lcd_number_write(ADC_Value,10);
-					}
-			if(ADC_Value>9)
-				{
-					lcd_cursor(row,coloumn);
-					lcd_number_write(ADC_Value,10);
-				}
+	if(ADC_Value <= 23){
+		if(ADC_Value<=9){
+			lcd_cursor(row,coloumn);
+			lcd_string_write("0");
+			lcd_cursor(row,coloumn+1);
+			lcd_number_write(ADC_Value,10);
+		}
+
+		if(ADC_Value>9){
+			lcd_cursor(row,coloumn);
+			lcd_number_write(ADC_Value,10);
+		}
 		return ADC_Value;
 	}
     if(ADC_Value >23)
 	   return 23;
-
-
 }
 
 int print_minute(char row, char coloumn,unsigned char channel) {
 	ADC_Value = ReadVoltage();
 	ADC_Value = (ADC_Value*60) / 255;
-	//lcd_print(row, coloumn, ADC_Value, 2);
+
 	lcd_cursor(row,coloumn);
-	if(ADC_Value <= 59)
-	{
-			if(ADC_Value<=9)
-					{
-						lcd_cursor(row,coloumn);
-						lcd_string_write("0");
-						lcd_cursor(row,coloumn+1);
-						lcd_number_write(ADC_Value,10);
-					}
-			if(ADC_Value>9)
-				{
-					lcd_cursor(row,coloumn);
-					lcd_number_write(ADC_Value,10);
-				}
-			return ADC_Value;
+	if(ADC_Value <= 59){
+		if(ADC_Value<=9){
+			lcd_cursor(row,coloumn);
+			lcd_string_write("0");
+			lcd_cursor(row,coloumn+1);
+			lcd_number_write(ADC_Value,10);
+		}
+
+		if(ADC_Value>9){
+			lcd_cursor(row,coloumn);
+			lcd_number_write(ADC_Value,10);
+		}
+		return ADC_Value;
 	}
 	if(ADC_Value >59)
 	   return 59;
-
-
 }
 
 int print_yr(char row, char coloumn,unsigned char channel) {
 	ADC_Value = ReadVoltage();
 	ADC_Value = (ADC_Value*100) / 255;
+
 	if(ADC_Value <= 99)
-		{
-			if(ADC_Value<=9)
-						{
-							lcd_cursor(row,coloumn);
-							lcd_string_write("0");
-							lcd_cursor(row,coloumn+1);
-							lcd_number_write(ADC_Value,10);
-						}
-				if(ADC_Value>9)
-					{
-						lcd_cursor(row,coloumn);
-						lcd_number_write(ADC_Value,10);
-					}
-				return ADC_Value;
+	{
+		if(ADC_Value<=9){
+			lcd_cursor(row,coloumn);
+			lcd_string_write("0");
+			lcd_cursor(row,coloumn+1);
+			lcd_number_write(ADC_Value,10);
 		}
-		if(ADC_Value >99)
-		   return 99;
+
+		if(ADC_Value>9){
+			lcd_cursor(row,coloumn);
+			lcd_number_write(ADC_Value,10);
+		}
+		return ADC_Value;
+	}
+
+	if(ADC_Value >99)
+	   return 99;
 }
 
 int print_date(char row, char coloumn,unsigned char channel) {
 	ADC_Value = ReadVoltage();
 	ADC_Value = (ADC_Value*31) / 255;
-	if(ADC_Value <= 31)
-		{
-			if(ADC_Value<=9)
-						{
-							if(ADC_Value<1)
-								ADC_Value=1;
-							lcd_cursor(row,coloumn);
-							lcd_string_write("0");
-							lcd_cursor(row,coloumn+1);
-							lcd_number_write(ADC_Value,10);
-						}
-				if(ADC_Value>9)
-					{
-						lcd_cursor(row,coloumn);
-						lcd_number_write(ADC_Value,10);
-					}
-				return ADC_Value;
+
+	if(ADC_Value <= 31){
+		if(ADC_Value<=9){
+			if(ADC_Value<1)
+				ADC_Value=1;
+			lcd_cursor(row,coloumn);
+			lcd_string_write("0");
+			lcd_cursor(row,coloumn+1);
+			lcd_number_write(ADC_Value,10);
+		}
+
+			if(ADC_Value>9){
+				lcd_cursor(row,coloumn);
+				lcd_number_write(ADC_Value,10);
+			}
+			return ADC_Value;
 		}
 		if(ADC_Value >31)
-		   return 31;
+			return 31;
 }
 
 int print_month(char row, char coloumn,unsigned char channel) {
 	ADC_Value = ReadVoltage();
 	ADC_Value = (ADC_Value*12) / 255;
-	if(ADC_Value <= 11)
-		{
-			if(ADC_Value<=9)
-						{
-							lcd_cursor(row,coloumn);
-							lcd_string_write("0");
-							lcd_cursor(row,coloumn+1);
-							lcd_number_write(ADC_Value+1,10);
-						}
-				if(ADC_Value>9)
-					{
-						lcd_cursor(row,coloumn);
-						lcd_number_write(ADC_Value+1,10);
-					}
-				return ADC_Value+1;
+
+	if(ADC_Value <= 11){
+		if(ADC_Value<=9){
+			lcd_cursor(row,coloumn);
+			lcd_string_write("0");
+			lcd_cursor(row,coloumn+1);
+			lcd_number_write(ADC_Value+1,10);
 		}
-		if(ADC_Value >11)
-		   return 12;
+
+		if(ADC_Value>9){
+			lcd_cursor(row,coloumn);
+			lcd_number_write(ADC_Value+1,10);
+		}
+		return ADC_Value+1;
+	}
+	if(ADC_Value >11)
+	   return 12;
 }
 
 //Function to display date and time on the LCD
-
 void display_time(void) {
 	char *weekdays[] = {
-	                    "SUN",
-	                    "MON",
+						"SUN",
+						"MON",
 						"TUE",
-	                    "WED",
+						"WED",
 						"THU",
-	                    "FRI",
-	                    "SAT",
-	    	       	   };
-	//unsigned char second_byte = 0,minute_byte = 0,hour_byte = 0;
+						"FRI",
+						"SAT",
+	};
+
 	int day1 = 0;
-	//unsigned char day = 0;
 
-	//unsigned char prev_sec = 0,prev_hour_byte = 0;
-
-	//hour_byte = ds1307_read_hour();            // read hour regiter and store
-	//hour_byte = hour_calculation(hour_byte);// call for mode display
 	hr=convert_bcd_to_decimal(ds1307_read_hour());
-	//minute_byte = ds1307_read_minute();       // read minute regiter and store
 	min=convert_bcd_to_decimal(ds1307_read_minute());
-	//second_byte = ds1307_read_second();        // read seconds regiter and store
 	sec = convert_bcd_to_decimal(ds1307_read_second());
-
 	day1=convert_bcd_to_decimal(ds1307_read_day());
 	date=convert_bcd_to_decimal(ds1307_read_date());
 	month=convert_bcd_to_decimal(ds1307_read_month());
 	year=convert_bcd_to_decimal(ds1307_read_year());
 
-
-
-
 	//displaying style
-	if(date<=9)
-					{
-						lcd_cursor(1,3);
-						lcd_string_write("0");
-						lcd_cursor(1,4);
-						lcd_number_write(date,10);
-					} else {
-						lcd_cursor(1,3);
-						lcd_number_write(date,10);
-					}
-	if(month<=9)
-				{
-					lcd_cursor(1,6);
-					lcd_string_write("0");
-					lcd_cursor(1,7);
-					lcd_number_write(month,10);
-				} else {
-						lcd_cursor(1,6);
-						lcd_number_write(month,10);
-					}
-	if(year<=9)
-					{
-						lcd_cursor(1,9);
-						lcd_string_write("0");
-						lcd_cursor(1,10);
-						lcd_number_write(year,10);
-					} else {
-						lcd_cursor(1,9);
-						lcd_number_write(year,10);
-					}
+	if(date<=9){
+		lcd_cursor(1,3);
+		lcd_string_write("0");
+		lcd_cursor(1,4);
+		lcd_number_write(date,10);
+	} else {
+		lcd_cursor(1,3);
+		lcd_number_write(date,10);
+	}
+
+	if(month<=9){
+		lcd_cursor(1,6);
+		lcd_string_write("0");
+		lcd_cursor(1,7);
+		lcd_number_write(month,10);
+	} else {
+			lcd_cursor(1,6);
+			lcd_number_write(month,10);
+	}
+
+	if(year<=9){
+		lcd_cursor(1,9);
+		lcd_string_write("0");
+		lcd_cursor(1,10);
+		lcd_number_write(year,10);
+	} else {
+		lcd_cursor(1,9);
+		lcd_number_write(year,10);
+	}
 
 
 	lcd_cursor(1,13);
@@ -368,38 +330,35 @@ void display_time(void) {
 	//lcd_data_write(day);
 
     // displaying style
-	if(hr<=9)
-					{
-						lcd_cursor(2,3);
-						lcd_string_write("0");
-						lcd_cursor(2,4);
-						lcd_number_write(hr,10);
-					} else {
-						lcd_cursor(2,3);
-						lcd_number_write(hr,10);
-					}
+	if(hr<=9){
+		lcd_cursor(2,3);
+		lcd_string_write("0");
+		lcd_cursor(2,4);
+		lcd_number_write(hr,10);
+	} else {
+		lcd_cursor(2,3);
+		lcd_number_write(hr,10);
+	}
 
-	if(min<=9)
-					{
-						lcd_cursor(2,6);
-						lcd_string_write("0");
-						lcd_cursor(2,7);
-						lcd_number_write(min,10);
-					} else {
-						lcd_cursor(2,6);
-						lcd_number_write(min,10);
-					}
+	if(min<=9){
+		lcd_cursor(2,6);
+		lcd_string_write("0");
+		lcd_cursor(2,7);
+		lcd_number_write(min,10);
+	} else {
+		lcd_cursor(2,6);
+		lcd_number_write(min,10);
+	}
 
-	if(sec<=9)
-					{
-						lcd_cursor(2,9);
-						lcd_string_write("0");
-						lcd_cursor(2,10);
-						lcd_number_write(sec,10);
-					} else {
-						lcd_cursor(2,9);
-						lcd_number_write(sec,10);
-					}
+	if(sec<=9){
+		lcd_cursor(2,9);
+		lcd_string_write("0");
+		lcd_cursor(2,10);
+		lcd_number_write(sec,10);
+	} else {
+		lcd_cursor(2,9);
+		lcd_number_write(sec,10);
+	}
 
 
 }
@@ -452,102 +411,100 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 		}
 
 	}
+
 	if(intervals > 0){
-	eeprom_write_word((uint16_t *) (mode_addr) , intervals);
+		eeprom_write_word((uint16_t *) (mode_addr) , intervals);
 
-	int i;
-	for(i=0; i<intervals; i++)
-	{
-		clock:
-		lcd_cursor(1,1);
-		lcd_string_write("HRS:min   P");
-
-		switch(mode_addr){
-			case MODE0:
-				lcd_number_write(0,10);
-				break;
-			case MODE1:
-				lcd_number_write(1,10);
-				break;
-			case MODE2:
-				lcd_number_write(2,10);
-				break;
-		}
-
-		lcd_string_write(" T");
-
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,1);
-		lcd_string_write("  :         of  ");
-		lcd_cursor(2,11);
-		lcd_number_write(i+1,10);
-		lcd_cursor(2,15);
-		lcd_number_write(intervals,10);
-
-
-
-		while(1) // setting hrs
+		int i;
+		for(i=0; i<intervals; i++)
 		{
-			temp1=PINA;
-			hr=print_hour(2,1,0);
+			clock:
+			lcd_cursor(1,1);
+			lcd_string_write("HRS:min   P");
 
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
+			switch(mode_addr){
+				case MODE0:
+					lcd_number_write(0,10);
+					break;
+				case MODE1:
+					lcd_number_write(1,10);
+					break;
+				case MODE2:
+					lcd_number_write(2,10);
+					break;
 			}
 
-			if((temp1 & 0x02)!=0x00) // EXIT button
+			lcd_string_write(" T");
+			lcd_number_write(i+1,10);
+			lcd_cursor(2,1);
+			lcd_string_write("  :         of  ");
+			lcd_cursor(2,11);
+			lcd_number_write(i+1,10);
+			lcd_cursor(2,15);
+			lcd_number_write(intervals,10);
+
+			while(1) // setting hrs
 			{
-				lcd_command_write(0x01); //clear screen
-				return 0;
-				break;
-			}
-		}
+				temp1=PINA;
+				hr=print_hour(2,1,0);
 
-		lcd_cursor(1,1);
-		lcd_string_write("hrs:MIN   P");
-
-				switch(mode_addr){
-					case MODE0:
-						lcd_number_write(0,10);
-						break;
-					case MODE1:
-						lcd_number_write(1,10);
-						break;
-					case MODE2:
-						lcd_number_write(2,10);
-						break;
+				if((temp1 & 0x01)!=0x00) // OK button
+				{
+					break;
 				}
-				lcd_string_write(" T");
 
-
-		while(1) // setting minutes
-		{
-			temp1=PINA;
-			min=print_minute(2,4,0);
-
-			if((temp1 & 0x01)!=0x00) // OK button
-			{
-				break;
+				if((temp1 & 0x02)!=0x00) // EXIT button
+				{
+					lcd_command_write(0x01); //clear screen
+					return 0;
+					break;
+				}
 			}
 
-			if((temp1 & 0x02)!=0x00) // EXIT button
+			lcd_cursor(1,1);
+			lcd_string_write("hrs:MIN   P");
+
+					switch(mode_addr){
+						case MODE0:
+							lcd_number_write(0,10);
+							break;
+						case MODE1:
+							lcd_number_write(1,10);
+							break;
+						case MODE2:
+							lcd_number_write(2,10);
+							break;
+					}
+					lcd_string_write(" T");
+
+
+			while(1) // setting minutes
 			{
-				lcd_command_write(0x01); //clear screen
-				goto clock;
-				break;
+				temp1=PINA;
+				min=print_minute(2,4,0);
+
+				if((temp1 & 0x01)!=0x00) // OK button
+				{
+					break;
+				}
+
+				if((temp1 & 0x02)!=0x00) // EXIT button
+				{
+					lcd_command_write(0x01); //clear screen
+					goto clock;
+					break;
+				}
 			}
+			eeprom_write_word((uint16_t *) (mode_addr+i*2+2) , (hr*100+min));
+			lcd_cursor(2,9);
+	//		lcd_number_write((mode_addr+i*2),10);
+	//		_delay_ms(100);
+			lcd_command_write(0x01); //clear screen
 		}
-		eeprom_write_word((uint16_t *) (mode_addr+i*2+2) , (hr*100+min));
-		lcd_cursor(2,9);
-//		lcd_number_write((mode_addr+i*2),10);
-//		_delay_ms(100);
-		lcd_command_write(0x01); //clear screen
-	}
 	}
 }
 
-void menu_option_run(const int mode_addr){
+int menu_option_run(const int mode_addr){
 	int i=0; //restart counter
 	int intervals = 0;
 	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
@@ -587,25 +544,20 @@ void menu_option_run(const int mode_addr){
 		switch(mode_addr){
 			case MODE0:
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
-				break;
+				return 1;
 			case MODE1:
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
-				break;
+				return 1;
 			case MODE2:
 				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
-				break;
-
-		}
-		if(break_loop == 1){
-			break;
+				return 1;
 		}
 	}
+	return 0;
 }
 
 int menu_option_mode(const int mode_addr){
-	int menu = 0, menu_select = 0, sub_select =0, goto_result=0;
-	// NOTE: goto_result is used to tell the calling function to go back to main menu
-
+	int menu = 0, menu_select = 0, sub_select =0;
 	lcd_command_write(0x01); //clear screen
 	lcd_cursor(1,1);
 	lcd_string_write("   P");
@@ -648,8 +600,7 @@ int menu_option_mode(const int mode_addr){
 		if((temp1 & 0x02)!=0x00) // EXIT button
 		{
 			lcd_command_write(0x01); //clear screen
-			goto_result = 1;
-			break;
+			return 1;
 		}
 	}
 
@@ -713,8 +664,6 @@ int menu_option_mode(const int mode_addr){
 					}
 					lcd_string_write(" T");
 					lcd_number_write(i+1,10);
-					//lcd_cursor(1,16);
-					//lcd_string_write(" ");
 					if((eeprom_read_word(mode_addr+i*2+2)/100) <= 9)
 					{
 						lcd_cursor(2,1);
@@ -814,54 +763,37 @@ int menu_option_mode(const int mode_addr){
 }
 
 int main(){
-	// variables used in the code
-	//int hr = 0, min = 0, min_prev = 0, sec = 0, day = 0, date = 0, month = 0,
-		int yr =0;
-		int menu = 0, menu_select = 0, sub_select =0;
-		//int a = 0,
 
-		int r = 0, d = 0;
+	int yr =0, menu = 0, menu_select = 0, sub_select =0, r = 0, d = 0;
+	int leap[12]={-1,2,3,6,1,4,6,2,5,0,3,5};
+	int nonleap[12]={0,3,3,6,1,4,6,2,5,0,3,5};
 
-		//int pause=0;
-		//int sw1, sw2, h;
-		//int s;
-		int leap[12]={-1,2,3,6,1,4,6,2,5,0,3,5};
-		int nonleap[12]={0,3,3,6,1,4,6,2,5,0,3,5};
+	adc_init();	// ADC initialization
 
+	twi_init();	//TWI initialization
 
-		adc_init();
+	lcd_init();	//LCD initialization
+
+	//All the 8 pins of PortD are declared output (data pins of LCD are connected)
 	DDRD=0xff;
-	/*All the 8 pins of PortD are declared output (data pins of LCD are connected)*/
 
+	//PB0, PB1 and PB2 pins of PortB are declared output (control pins of LCD are connected)
 	DDRB=0x07;
-	/*PB0, PB1 and PB2 pins of PortB are declared output (control pins of LCD are connected)*/
-	DDRC=DDRC | 0xfc;
+
 	//PC2 and PC3 set as output for relay/buzzer
+	DDRC=DDRC | 0xfc;
 
 	//switches and inputs
 	DDRA = DDRA & 0x00;   //PORTE pin set as input
 	PORTA = PORTA | 0xFF; //PORTE internal pull-up enabled
 	ADCSRA=0X85; //adc config
 
-	//unsigned char sec=0,min=0;
-	/*Variable declaration*/
-
-	twi_init();
-	/*TWI initialisaiton*/
-
-	lcd_init();
-	/*LCD initialisaiton*/
-
-
 	/*String display in 1st row of LCD*/
 	lcd_cursor(1,1);
 	lcd_string_write("-----EXMPLR-----");
 	lcd_command_write(0xc0);
+
 	/*Cursor moves to 2nd row 1st column of LCD*/
-
-	//Position the LCD cursor at "row", "column"
-
-
 	lcd_cursor(2,1);
 	lcd_string_write("  AUTOCLK  3.0  ");
 	/*String display in 2nd row of LCD*/
@@ -874,10 +806,8 @@ int main(){
 	while(1)
 	{
 		main:
-		temp1 = PINA;
 
 		//battery low
-
 		/*
 		date=convert_bcd_to_decimal(ds1307_read_date());
 		if(date==0)
@@ -896,160 +826,83 @@ int main(){
 			}
 		}
 		*/
-	//read the Port L
+		temp1 = PINA;
+		//set mode: used to set the time HRS:MIN:SEC of RTC timer
+		if((temp1 & 0x08) != 0x00) // MENU button
+		{
+			// choose menu
+			lcd_command_write(0x01); //clear screen
 
-			//set mode: used to set the time HRS:MIN:SEC of RTC timer
-			if((temp1 & 0x08) != 0x00) // MENU button
+			//menu
+			menu:
+			lcd_cursor(1,1);
+			lcd_string_write("MENU:           ");
+
+			while(1)
 			{
-				// choose menu
-				lcd_command_write(0x01); //clear screen
-
-				//menu
-				menu:
-				lcd_cursor(1,1);
-				lcd_string_write("MENU:           ");
-
-				while(1)
+				temp1 = PINA;
+				menu = ReadVoltage();
+				lcd_cursor(2,1);
+				if(menu > 0 && menu <= 30)
 				{
-					temp1 = PINA;
-					menu = ReadVoltage();
+					// set master time
+					lcd_string_write("| Master Clock >");
+					menu_select=1;
+					//goto master_clock;
+				}
+				if(menu > 30 && menu <= 60)
+				{
+				// set P0 time
+					lcd_string_write("<  P0   Clock  >");
+					menu_select=2;
+					//goto P0_clock;
+				}
+				if(menu > 60 && menu <= 90)
+				{
+				// set P1 time
+					lcd_string_write("<  P1   Clock  >");
+					menu_select=3;
+				}
+				if(menu > 90 && menu <= 255)
+				{
+				// set P2 time
+					lcd_string_write("<  P2   Clock  |");
+					menu_select=4;
+				}
+				if((temp1 & 0x02)!=0x00) // EXIT button
+				{
+					lcd_command_write(0x01); //clear screen
+					menu_select=0;
+					goto main;
+				}
+
+				if((temp1 & 0x01)!=0x00) // OK button
+				{
+					//function into mode as per menu_select
+					lcd_command_write(0x01); //clear screen
 					lcd_cursor(2,1);
-					if(menu > 0 && menu <= 30)
-					{
-						// set master time
-						lcd_string_write("| Master Clock >");
-						menu_select=1;
-						//goto master_clock;
-					}
-					if(menu > 30 && menu <= 60)
-					{
-					// set P0 time
-						lcd_string_write("<  P0   Clock  >");
-						menu_select=2;
-						//goto P0_clock;
-					}
-					if(menu > 60 && menu <= 90)
-					{
-					// set P1 time
-						lcd_string_write("<  P1   Clock  >");
-						menu_select=3;
-					}
-					if(menu > 90 && menu <= 255)
-					{
-					// set P2 time
-					    lcd_string_write("<  P2   Clock  |");
-						menu_select=4;
-					}
-					if((temp1 & 0x02)!=0x00) // EXIT button
-					{
-						lcd_command_write(0x01); //clear screen
-						menu_select=0;
-						goto main;
-					}
-
-					if((temp1 & 0x01)!=0x00) // OK button
-					{
-						//function into mode as per menu_select
-						lcd_command_write(0x01); //clear screen
-						lcd_cursor(2,1);
 
 
-						while(1)
+					while(1)
+					{
+						//set master clock
+
+						if(menu_select == 1)
 						{
-							//set master clock
+							master_clock:
+							//_continue=0;
+							lcd_cursor(1,1);
+							lcd_string_write("Set HRS:min:sec");
+							lcd_cursor(2,1);
+							lcd_string_write("  :  :          ");
 
-							if(menu_select == 1)
+							while(1) // setting hrs
 							{
-								master_clock:
-								//_continue=0;
-								lcd_cursor(1,1);
-								lcd_string_write("Set HRS:min:sec");
-								lcd_cursor(2,1);
-								lcd_string_write("  :  :          ");
-
-								while(1) // setting hrs
+								temp1=PINA;
+								hr=print_hour(2,1,0);
+								if((temp1 & 0x01)!=0x00) // OK button
 								{
-									temp1=PINA;
-									hr=print_hour(2,1,0);
-									if((temp1 & 0x01)!=0x00) // OK button
-									{
-										break;
-									}
-									if((temp1 & 0x02)!=0x00) // EXIT button
-									{
-										lcd_command_write(0x01); //clear screen
-										goto menu;
-										break;
-									}
-								}
-
-								lcd_cursor(1,1);
-								lcd_string_write("Set hrs:MIN:sec");
-
-								while(1) // setting minutes
-								{
-									temp1=PINA;
-									min=print_minute(2,4,0);
-									if((temp1 & 0x01)!=0x00) // OK button
-									{
-
-										break;
-									}
-									if((temp1 & 0x02)!=0x00) // EXIT button
-									{
-										lcd_command_write(0x01); //clear screen
-										goto master_clock;
-										break;
-									}
-								}
-
-								lcd_cursor(1,1);
-								lcd_string_write("Set hrs:min:SEC");
-
-
-
-								while(1) // setting seconds
-								{
-									temp1=PINA;
-									sec=print_minute(2,7,0);
-									if((temp1 & 0x01)!=0x00) // OK button
-									{
-
-										break;
-									}
-									if((temp1 & 0x02)!=0x00) // EXIT button
-									{
-										lcd_command_write(0x01); //clear screen
-										goto master_clock;
-										break;
-									}
-								}
-								ds1307_hour_write(hr,0,0);
-								ds1307_minute_write(min);
-								ds1307_second_write(sec);
-
-								date:
-
-								lcd_cursor(1,1);
-								lcd_string_write("Set DD:mm:yy     ");
-								lcd_cursor(2,1);
-								lcd_string_write("  :  :          ");
-
-								while(1) //setting date
-								{
-									temp1=PINA;
-									date = print_date(2,1,0);
-									if((temp1 & 0x01)!=0x00) // OK button
-									{
-										break;
-									}
-									if((temp1 & 0x02)!=0x00) // EXIT button
-									{
-										lcd_command_write(0x01); //clear screen
-										goto master_clock;
-										break;
-									}
-
+									break;
 								}
 								if((temp1 & 0x02)!=0x00) // EXIT button
 								{
@@ -1057,83 +910,158 @@ int main(){
 									goto menu;
 									break;
 								}
-								lcd_cursor(1,1);
-								lcd_string_write("Set dd:MM:yy      ");
+							}
 
-								while(1) //setting month
+							lcd_cursor(1,1);
+							lcd_string_write("Set hrs:MIN:sec");
+
+							while(1) // setting minutes
+							{
+								temp1=PINA;
+								min=print_minute(2,4,0);
+								if((temp1 & 0x01)!=0x00) // OK button
 								{
-									temp1=PINA;
-									month = print_month(2,4,0);
-									if((temp1 & 0x01)!=0x00) // OK button
-									{
-										break;
-									}
-									if((temp1 & 0x02)!=0x00) // EXIT button
-									{
-										lcd_command_write(0x01); //clear screen
-										goto date;
-										break;
-									}
 
+									break;
 								}
-
-								lcd_cursor(1,1);
-								lcd_string_write("Set dd:mm:YY");
-
-								while(1) //setting year
+								if((temp1 & 0x02)!=0x00) // EXIT button
 								{
-									temp1=PINA;
-									yr = print_yr(2,7,0);
-									if((temp1 & 0x01)!=0x00) // OK button
-									{
-										break;
-									}
-									if((temp1 & 0x02)!=0x00) // EXIT button
-									{
-										lcd_command_write(0x01); //clear screen
-										goto date;
-										break;
-									}
-
+									lcd_command_write(0x01); //clear screen
+									goto master_clock;
+									break;
 								}
-								ds1307_date_write(date);
-								ds1307_month_write(month);
-								ds1307_year_write(yr);
-								if(yr%4 == 0)
+							}
+
+							lcd_cursor(1,1);
+							lcd_string_write("Set hrs:min:SEC");
+
+
+
+							while(1) // setting seconds
+							{
+								temp1=PINA;
+								sec=print_minute(2,7,0);
+								if((temp1 & 0x01)!=0x00) // OK button
 								{
-									d=date+leap[month-1]+yr+(yr/4)+6;
-								} else
-								{
-									d=date+nonleap[month-1]+yr+(yr/4)+6;
+
+									break;
 								}
+								if((temp1 & 0x02)!=0x00) // EXIT button
+								{
+									lcd_command_write(0x01); //clear screen
+									goto master_clock;
+									break;
+								}
+							}
+							ds1307_hour_write(hr,0,0);
+							ds1307_minute_write(min);
+							ds1307_second_write(sec);
 
-								r=d%7 + 1;
+							date:
 
-								ds1307_day_write(r);
+							lcd_cursor(1,1);
+							lcd_string_write("Set DD:mm:yy     ");
+							lcd_cursor(2,1);
+							lcd_string_write("  :  :          ");
 
-
-								//ending codes to go back to menu
-								menu_select=0;
-								goto menu; //all values set, goto menu
-
+							while(1) //setting date
+							{
+								temp1=PINA;
+								date = print_date(2,1,0);
+								if((temp1 & 0x01)!=0x00) // OK button
+								{
+									break;
+								}
+								if((temp1 & 0x02)!=0x00) // EXIT button
+								{
+									lcd_command_write(0x01); //clear screen
+									goto master_clock;
+									break;
+								}
 
 							}
 
-							//set P0
-							if(menu_select==2){
-								if(menu_option_mode(MODE0) == 1)
-									goto menu;
+							if((temp1 & 0x02)!=0x00) // EXIT button
+							{
+								lcd_command_write(0x01); //clear screen
+								goto menu;
+								break;
 							}
+							lcd_cursor(1,1);
+							lcd_string_write("Set dd:MM:yy      ");
+
+							while(1) //setting month
+							{
+								temp1=PINA;
+								month = print_month(2,4,0);
+								if((temp1 & 0x01)!=0x00) // OK button
+								{
+									break;
+								}
+								if((temp1 & 0x02)!=0x00) // EXIT button
+								{
+									lcd_command_write(0x01); //clear screen
+									goto date;
+									break;
+								}
+
+							}
+
+							lcd_cursor(1,1);
+							lcd_string_write("Set dd:mm:YY");
+
+							while(1) //setting year
+							{
+								temp1=PINA;
+								yr = print_yr(2,7,0);
+								if((temp1 & 0x01)!=0x00) // OK button
+								{
+									break;
+								}
+								if((temp1 & 0x02)!=0x00) // EXIT button
+								{
+									lcd_command_write(0x01); //clear screen
+									goto date;
+									break;
+								}
+
+							}
+							ds1307_date_write(date);
+							ds1307_month_write(month);
+							ds1307_year_write(yr);
+							if(yr%4 == 0)
+							{
+								d=date+leap[month-1]+yr+(yr/4)+6;
+							} else
+							{
+								d=date+nonleap[month-1]+yr+(yr/4)+6;
+							}
+
+							r=d%7 + 1;
+
+							ds1307_day_write(r);
+
+
+							//ending codes to go back to menu
+							menu_select=0;
+							goto menu; //all values set, goto menu
+
+
+						}
+
+						//P0 MODE
+						if(menu_select==2){
+							if(menu_option_mode(MODE0) == 1)
+								goto menu;
+						}
 
 						//P1 MODE
-							//set P0
 						if(menu_select==3){
 							if(menu_option_mode(MODE1) == 1)
 								goto menu;
 						}
 
 						//P2 MODE
-							//set P2
 						if(menu_select==4){
 							if(menu_option_mode(MODE2) == 1)
 								goto menu;
@@ -1148,26 +1076,23 @@ int main(){
 						lcd_command_write(0x01); //clear screen
 						break;
 					}
-
 				}
-
-
 			}
-			}
-			// RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
-				display_date_time_format();	// draw / / for date and : : for time on LCD
-				if((temp1 & 0x10)!=0x00)
-				{
-					menu_option_run(MODE1);
-				}
-				if((temp1 & 0x20)!=0x00)
-				{
-					menu_option_run(MODE2);
-				}
-				if(((temp1 & 0x10)==0x00) && ((temp1 & 0x20)==0x00))
-				{
-					menu_option_run(MODE0);
-				}
+		}
+		// RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
+		display_date_time_format();	// draw / / for date and : : for time on LCD
+		if((temp1 & 0x10)!=0x00)
+		{
+			menu_option_run(MODE1);
+		}
+		if((temp1 & 0x20)!=0x00)
+		{
+			menu_option_run(MODE2);
+		}
+		if(((temp1 & 0x10)==0x00) && ((temp1 & 0x20)==0x00))
+		{
+			menu_option_run(MODE0);
+		}
 
 	} //while loop
 
