@@ -770,10 +770,6 @@ int main(){
 
 	adc_init();	// ADC initialization
 
-	twi_init();	//TWI initialization
-
-	lcd_init();	//LCD initialization
-
 	//All the 8 pins of PortD are declared output (data pins of LCD are connected)
 	DDRD=0xff;
 
@@ -787,6 +783,11 @@ int main(){
 	DDRA = DDRA & 0x00;   //PORTE pin set as input
 	PORTA = PORTA | 0xFF; //PORTE internal pull-up enabled
 	ADCSRA=0X85; //adc config
+
+
+	twi_init();	//TWI initialization
+
+	lcd_init();	//LCD initialization
 
 	/*String display in 1st row of LCD*/
 	lcd_cursor(1,1);
