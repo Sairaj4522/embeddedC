@@ -1154,7 +1154,7 @@ int main(){
 
 			}
 			}
-			// else { // RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
+			// RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
 				display_date_time_format();	// draw / / for date and : : for time on LCD
 				if((temp1 & 0x10)!=0x00)
 				{
@@ -1168,16 +1168,13 @@ int main(){
 				{
 					menu_option_run(MODE0);
 				}
-				//bell_H(h);
-				//bell_S(s);
-		//	}
 
 	} //while loop
 
 	return 0;
 }//main function
 
-//TODO Extract code out of main function to create a new function for modify feature,
+//TODO Extract code out ofmenu_option_mode() to create a new function for modify feature,
 // function name would be menu_option_modify()
 
 //TODO add feature to set different bell durations
