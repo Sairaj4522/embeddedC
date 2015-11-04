@@ -506,7 +506,7 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 
 int menu_option_run(const int mode_addr){
 	int i=0; //restart counter
-	int intervals = 0;
+	int intervals = 0, temp_word = 0;
 	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
 	int break_loop = 0;
 
@@ -528,8 +528,8 @@ int menu_option_run(const int mode_addr){
 	while(1)
 	{
 		display_time();
-
-		if((hr==(eeprom_read_word((uint16_t *) (mode_addr + i*2+2))/100)) && (min == (eeprom_read_word((uint16_t *) (mode_addr + i*2+2) )%100))){
+		temp_word = eeprom_read_word((uint16_t *) (mode_addr + i*2+2));
+		if((hr==(temp_word/100)) && (min == (temp_word%100))){
 			//  ring_bell_long(1);
 			PORTC = (PC2<<1)|(PC3<<1);	//Pins PC2(buzzer) and PC3(bell1) will go high
 			_delay_ms(500);
@@ -539,18 +539,21 @@ int menu_option_run(const int mode_addr){
 		}
 		if(i>intervals)
 			break;
-		temp1=PINA;
 
+		temp1=PINA;
 		switch(mode_addr){
 			case MODE0:
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
-				return 1;
+				break;
 			case MODE1:
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
-				return 1;
+				break;
 			case MODE2:
 				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
-				return 1;
+				break;
+		}
+		if(break_loop == 1){
+			return 1;
 		}
 	}
 	return 0;
@@ -614,7 +617,7 @@ int menu_option_mode(const int mode_addr){
 		}
 		if(sub_select==1) //editting selected timings
 		{
-			int i=0,i_prev=0;
+			int i=0;
 			int  intervals = eeprom_read_word(mode_addr);
 			if(intervals == -1){
 				lcd_cursor(1,1);
@@ -633,10 +636,12 @@ int menu_option_mode(const int mode_addr){
 			} else {
 				modify:
 
+
 				lcd_cursor(2,1);
 				lcd_string_write("  :         of  ");
 				while(1)
 					{
+					int temp_word = 0, temp_word1 = 0, temp_word2 = 0;
 					i = (ReadVoltage()*0.090196078);
 					if(i<0)
 						i=0;
@@ -664,34 +669,29 @@ int menu_option_mode(const int mode_addr){
 					}
 					lcd_string_write(" T");
 					lcd_number_write(i+1,10);
-					if((eeprom_read_word(mode_addr+i*2+2)/100) <= 9)
+
+					temp_word = (int) eeprom_read_word(mode_addr+i*2+2);
+					temp_word1 = temp_word/100;
+					temp_word2 = temp_word%100;
+					if(temp_word1 <= 9)
 					{
 						lcd_cursor(2,1);
 						lcd_string_write("0");
-						lcd_number_write(eeprom_read_word(mode_addr+i*2+2)/100,10);
-					}
-					if((eeprom_read_word(mode_addr+i*2+2)/100) > 9)
-					{
+						lcd_number_write(temp_word1,10);
+					} else {
 						lcd_cursor(2,1);
-						lcd_number_write(eeprom_read_word(mode_addr+i*2+2)/100,10);
+						lcd_number_write(temp_word1,10);
 					}
 
-					if((eeprom_read_word(mode_addr+i*2+2)%100) <= 9)
+					if(temp_word2 <= 9)
 					{
 						lcd_cursor(2,4);
 						lcd_string_write("0");
-						lcd_number_write(eeprom_read_word(mode_addr+i*2+2)%100,10);
-					}
-					if(eeprom_read_word(mode_addr+i*2+2)%100 > 9)
-					{
+						lcd_number_write(temp_word2,10);
+					} else {
 						lcd_cursor(2,4);
-						lcd_number_write(eeprom_read_word(mode_addr+i*2+2)%100,10);
+						lcd_number_write(temp_word2,10);
 					}
-					//lcd_string_write(eeprom_read_word(mode_addr+i+1));
-					//lcd_data_write(eeprom_read_word(mode_addr+i+1));
-
-					/*lcd_cursor(2,4);
-					lcd_number_write(eeprom_read_word(mode_addr+i+1)%100,10)	;*/
 
 					if(i+1 <= 9)
 						lcd_cursor(2,11);
@@ -733,7 +733,6 @@ int menu_option_mode(const int mode_addr){
 							}
 							if((temp1 & 0x02)!=0x00) // EXIT button
 							{
-								//lcd_command_write(0x01); //clear screen
 								goto set;
 								break;
 							}
@@ -747,8 +746,6 @@ int menu_option_mode(const int mode_addr){
 						lcd_command_write(0x01); //clear screen
 						return 1;
 					}
-					i_prev=i;
-
 
 					}
 			}
@@ -844,27 +841,27 @@ int main(){
 				temp1 = PINA;
 				menu = ReadVoltage();
 				lcd_cursor(2,1);
-				if(menu > 0 && menu <= 30)
+				if(menu > 0 && menu <= 60)
 				{
 					// set master time
 					lcd_string_write("| Master Clock >");
 					menu_select=1;
 					//goto master_clock;
 				}
-				if(menu > 30 && menu <= 60)
+				if(menu > 60 && menu <= 120)
 				{
 				// set P0 time
 					lcd_string_write("<  P0   Clock  >");
 					menu_select=2;
 					//goto P0_clock;
 				}
-				if(menu > 60 && menu <= 90)
+				if(menu > 120 && menu <= 180)
 				{
 				// set P1 time
 					lcd_string_write("<  P1   Clock  >");
 					menu_select=3;
 				}
-				if(menu > 90 && menu <= 255)
+				if(menu > 180 && menu <= 255)
 				{
 				// set P2 time
 					lcd_string_write("<  P2   Clock  |");
