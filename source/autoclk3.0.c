@@ -128,6 +128,7 @@ unsigned char temp1;
 
 // global declaration
 unsigned char date, month, year, hr, min, sec;
+unsigned char date_prev = 32, month_prev = 15, year_prev = 100, hr_prev = 25, min_prev = 60, sec_prev = 60;
 
 //adc to set time of the clock
 //unsigned char ADC_Conversion(unsigned char);
@@ -164,9 +165,7 @@ int print_hour(char row, char coloumn,unsigned char channel) {
 			lcd_string_write("0");
 			lcd_cursor(row,coloumn+1);
 			lcd_number_write(ADC_Value,10);
-		}
-
-		if(ADC_Value>9){
+		} else {
 			lcd_cursor(row,coloumn);
 			lcd_number_write(ADC_Value,10);
 		}
@@ -187,9 +186,7 @@ int print_minute(char row, char coloumn,unsigned char channel) {
 			lcd_string_write("0");
 			lcd_cursor(row,coloumn+1);
 			lcd_number_write(ADC_Value,10);
-		}
-
-		if(ADC_Value>9){
+		} else {
 			lcd_cursor(row,coloumn);
 			lcd_number_write(ADC_Value,10);
 		}
@@ -210,9 +207,7 @@ int print_yr(char row, char coloumn,unsigned char channel) {
 			lcd_string_write("0");
 			lcd_cursor(row,coloumn+1);
 			lcd_number_write(ADC_Value,10);
-		}
-
-		if(ADC_Value>9){
+		} else {
 			lcd_cursor(row,coloumn);
 			lcd_number_write(ADC_Value,10);
 		}
@@ -235,16 +230,15 @@ int print_date(char row, char coloumn,unsigned char channel) {
 			lcd_string_write("0");
 			lcd_cursor(row,coloumn+1);
 			lcd_number_write(ADC_Value,10);
+		} else {
+			lcd_cursor(row,coloumn);
+			lcd_number_write(ADC_Value,10);
 		}
-
-			if(ADC_Value>9){
-				lcd_cursor(row,coloumn);
-				lcd_number_write(ADC_Value,10);
-			}
 			return ADC_Value;
-		}
-		if(ADC_Value >31)
-			return 31;
+	}
+
+	if(ADC_Value >31)
+		return 31;
 }
 
 int print_month(char row, char coloumn,unsigned char channel) {
@@ -257,9 +251,7 @@ int print_month(char row, char coloumn,unsigned char channel) {
 			lcd_string_write("0");
 			lcd_cursor(row,coloumn+1);
 			lcd_number_write(ADC_Value+1,10);
-		}
-
-		if(ADC_Value>9){
+		} else {
 			lcd_cursor(row,coloumn);
 			lcd_number_write(ADC_Value+1,10);
 		}
@@ -267,6 +259,32 @@ int print_month(char row, char coloumn,unsigned char channel) {
 	}
 	if(ADC_Value >11)
 	   return 12;
+}
+
+uint8_t menu_scroll_4(){
+	uint8_t temp_val = ReadVoltage();
+
+	if(temp_val > 0 && temp_val <= 60)
+		return 1;
+	else if(temp_val > 60 && temp_val <= 120)
+		return 2;
+	else if(temp_val > 120 && temp_val <= 180)
+		return 3;
+	else if(temp_val > 180 && temp_val <= 255)
+		return 4;
+
+	return 0;
+}
+
+uint8_t menu_scroll_2(){
+	uint8_t temp_val = ReadVoltage();
+
+	if(temp_val > 0  && temp_val <= 120)
+		return 1;
+	else if(temp_val > 120 &&  temp_val <= 255)
+		return 2;
+
+	return 0;
 }
 
 //Function to display date and time on the LCD
@@ -292,86 +310,96 @@ void display_time(void) {
 	year=convert_bcd_to_decimal(ds1307_read_year());
 
 	//displaying style
-	if(date<=9){
-		lcd_cursor(1,3);
-		lcd_string_write("0");
-		lcd_cursor(1,4);
-		lcd_number_write(date,10);
-	} else {
-		lcd_cursor(1,3);
-		lcd_number_write(date,10);
-	}
+	if(date != date_prev){
+		if(date<=9){
+			lcd_cursor(1,3);
+			lcd_string_write("0");
+			lcd_cursor(1,4);
+			lcd_number_write(date,10);
+		} else {
+			lcd_cursor(1,3);
+			lcd_number_write(date,10);
+		}
+		lcd_cursor(1,5);
+		lcd_string_write("/");
+		lcd_cursor(1,8);
+		lcd_string_write("/");
 
-	if(month<=9){
-		lcd_cursor(1,6);
-		lcd_string_write("0");
-		lcd_cursor(1,7);
-		lcd_number_write(month,10);
-	} else {
+		lcd_cursor(1,13);
+		lcd_string_write(weekdays[day1-1]);
+
+		lcd_cursor(2,5);
+		lcd_string_write(":");
+		lcd_cursor(2,8);
+		lcd_string_write(":");
+	}
+	date_prev = date;
+
+	if(month != month_prev)
+		if(month<=9){
 			lcd_cursor(1,6);
+			lcd_string_write("0");
+			lcd_cursor(1,7);
 			lcd_number_write(month,10);
-	}
+		} else {
+				lcd_cursor(1,6);
+				lcd_number_write(month,10);
+		}
+	month_prev = month;
 
-	if(year<=9){
-		lcd_cursor(1,9);
-		lcd_string_write("0");
-		lcd_cursor(1,10);
-		lcd_number_write(year,10);
-	} else {
-		lcd_cursor(1,9);
-		lcd_number_write(year,10);
-	}
+	if(year != year_prev)
+		if(year<=9){
+			lcd_cursor(1,9);
+			lcd_string_write("0");
+			lcd_cursor(1,10);
+			lcd_number_write(year,10);
+		} else {
+			lcd_cursor(1,9);
+			lcd_number_write(year,10);
+		}
 
-
-	lcd_cursor(1,13);
-	//day=weekdays[day1-1];
-	//lcd_number_write(day1,10);
-	lcd_string_write(weekdays[day1-1]);
-	//lcd_data_write(day);
-
-    // displaying style
-	if(hr<=9){
-		lcd_cursor(2,3);
-		lcd_string_write("0");
-		lcd_cursor(2,4);
-		lcd_number_write(hr,10);
-	} else {
-		lcd_cursor(2,3);
-		lcd_number_write(hr,10);
-	}
-
-	if(min<=9){
-		lcd_cursor(2,6);
-		lcd_string_write("0");
-		lcd_cursor(2,7);
-		lcd_number_write(min,10);
-	} else {
-		lcd_cursor(2,6);
-		lcd_number_write(min,10);
-	}
-
-	if(sec<=9){
-		lcd_cursor(2,9);
-		lcd_string_write("0");
-		lcd_cursor(2,10);
-		lcd_number_write(sec,10);
-	} else {
-		lcd_cursor(2,9);
-		lcd_number_write(sec,10);
-	}
+	year_prev = year;
 
 
-}
 
-void display_date_time_format(){
-	lcd_cursor(1,5);
-	lcd_string_write("/");
-	lcd_cursor(1,8);
-	lcd_string_write("/");
-	lcd_cursor(2,5);
-	lcd_string_write(":");
-	lcd_cursor(2,8);
-	lcd_string_write(":");
+	// displaying style
+	if(hr != hr_prev)
+		if(hr<=9){
+			lcd_cursor(2,3);
+			lcd_string_write("0");
+			lcd_cursor(2,4);
+			lcd_number_write(hr,10);
+		} else {
+			lcd_cursor(2,3);
+			lcd_number_write(hr,10);
+		}
+	hr_prev = hr;
+
+	if(min != min_prev)
+		if(min<=9){
+			lcd_cursor(2,6);
+			lcd_string_write("0");
+			lcd_cursor(2,7);
+			lcd_number_write(min,10);
+		} else {
+			lcd_cursor(2,6);
+			lcd_number_write(min,10);
+		}
+	min_prev = min;
+
+	if(sec != sec_prev)
+		if(sec<=9){
+			lcd_cursor(2,9);
+			lcd_string_write("0");
+			lcd_cursor(2,10);
+			lcd_number_write(sec,10);
+		} else {
+			lcd_cursor(2,9);
+			lcd_number_write(sec,10);
+		}
+	sec_prev = sec;
+
+
 }
 
 int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MODE2
@@ -496,9 +524,6 @@ int menu_option_reset(const int mode_addr)// mode_addr can be MODE0 MODE1 or MOD
 				}
 			}
 			eeprom_write_word((uint16_t *) (mode_addr+i*2+2) , (hr*100+min));
-			lcd_cursor(2,9);
-	//		lcd_number_write((mode_addr+i*2),10);
-	//		_delay_ms(100);
 			lcd_command_write(0x01); //clear screen
 		}
 	}
@@ -508,7 +533,7 @@ int menu_option_run(const int mode_addr){
 	int i=0; //restart counter
 	int intervals = 0, temp_word = 0;
 	intervals = eeprom_read_word((uint16_t *) mode_addr);	// Load total no. of timings stored in eeprom
-	int break_loop = 0;
+	int break_loop = 5;
 
 	lcd_cursor(2,15);
 	lcd_string_write("P");
@@ -538,7 +563,7 @@ int menu_option_run(const int mode_addr){
 			i++;
 		}
 		if(i>intervals)
-			break;
+			i = 0;
 
 		temp1=PINA;
 		switch(mode_addr){
@@ -546,25 +571,26 @@ int menu_option_run(const int mode_addr){
 				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x10) !=0x00)||((temp1 & 0x20) !=0x00);
 				break;
 			case MODE1:
-				break_loop = ((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00);
+				break_loop = (((temp1 & 0x08) !=0x00)||((temp1 & 0x20) !=0x00)) || ((temp1 & 0x10) == 0x00);
 				break;
 			case MODE2:
-				break_loop = ((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00);
+				break_loop = (((temp1 & 0x10) !=0x00)||((temp1 & 0x08) !=0x00)) || ((temp1 & 0x20) == 0x00);
 				break;
 		}
 		if(break_loop == 1){
 			return 1;
 		}
 	}
-	return 0;
 }
 
 int menu_option_mode(const int mode_addr){
 	int menu = 0, menu_select = 0, sub_select =0;
 	lcd_command_write(0x01); //clear screen
+	mode_menu:
+
 	lcd_cursor(1,1);
 	lcd_string_write("   P");
-
+	int menu_prev = 3;
 	switch(mode_addr){
 		case MODE0:
 			lcd_number_write(0,10);
@@ -582,20 +608,23 @@ int menu_option_mode(const int mode_addr){
 	while(1)
 	{
 		lcd_cursor(2,1);
-		menu=ReadVoltage();
+		menu=menu_scroll_2();
+		if(menu != menu_prev){
+			if(menu == 1)
+			{
+				//modify
+				lcd_string_write("MODIFY    reset");
+				sub_select=1;
+			}
+			if(menu == 2)
+			{
+				//reset
+				lcd_string_write("modify    RESET");
+				sub_select=2;
+			}
+		}
+		menu_prev = menu;
 		temp1 = PINA;
-		if(menu < 30)
-		{
-			//modify
-			lcd_string_write("MODIFY    reset");
-			sub_select=1;
-		}
-		if(menu > 30)
-		{
-			//reset
-			lcd_string_write("modify    RESET");
-			sub_select=2;
-		}
 		if((temp1 & 0x01)!=0x00) // OK button
 		{
 			break;
@@ -617,7 +646,7 @@ int menu_option_mode(const int mode_addr){
 		}
 		if(sub_select==1) //editting selected timings
 		{
-			int i=0;
+
 			int  intervals = eeprom_read_word(mode_addr);
 			if(intervals == -1){
 				lcd_cursor(1,1);
@@ -632,74 +661,75 @@ int menu_option_mode(const int mode_addr){
 						break;
 				}
 				_delay_ms(50);
-				break;
+				goto mode_menu;
 			} else {
 				modify:
 
+				//----------------------------------------
+				// From here
+				lcd_cursor(1,1);
+				lcd_string_write("HRS:MIN   P");
+
+				switch(mode_addr){
+					case MODE0:
+						lcd_number_write(0,10);
+						break;
+					case MODE1:
+						lcd_number_write(1, 10);
+						break;
+					case MODE2:
+						lcd_number_write(2, 10);
+						break;
+				}
+				lcd_string_write(" T");
 
 				lcd_cursor(2,1);
 				lcd_string_write("  :         of  ");
-				while(1)
-					{
-					int temp_word = 0, temp_word1 = 0, temp_word2 = 0;
+
+				lcd_cursor(2,15);
+				lcd_number_write(intervals,10);
+				// to here, this code is before while loop so as to improve performance
+				//------------------------------------
+				int i = 0, i_prev=99, temp_word = 0;
+				while(1){
 					i = (ReadVoltage()*0.090196078);
 					if(i<0)
 						i=0;
 					if(i>(intervals-1))
 						i=intervals-1;
-					/*
-					if(i-i_prev !=0)
-					{
-						lcd_cursor(2,1);
-						lcd_string_write("  :         of  ");
-					}
-					*/
-					lcd_cursor(1,1);
-					lcd_string_write("HRS:MIN   P");
-					switch(mode_addr){
-						case MODE0:
-							lcd_number_write(0,10);
-							break;
-						case MODE1:
-							lcd_number_write(1, 10);
-							break;
-						case MODE2:
-							lcd_number_write(2, 10);
-							break;
-					}
-					lcd_string_write(" T");
-					lcd_number_write(i+1,10);
 
-					temp_word = (int) eeprom_read_word(mode_addr+i*2+2);
-					temp_word1 = temp_word/100;
-					temp_word2 = temp_word%100;
-					if(temp_word1 <= 9)
-					{
-						lcd_cursor(2,1);
-						lcd_string_write("0");
-						lcd_number_write(temp_word1,10);
-					} else {
-						lcd_cursor(2,1);
-						lcd_number_write(temp_word1,10);
+					if(i != i_prev){
+						lcd_cursor(1, 15);
+						lcd_number_write(i+1,10);
+
+						temp_word = (int) eeprom_read_word(mode_addr+i*2+2);
+						if(temp_word/100 <= 9){
+							lcd_cursor(2,1);
+							lcd_string_write("0");
+							lcd_number_write(temp_word/100,10);
+						} else {
+							lcd_cursor(2,1);
+							lcd_number_write(temp_word/100,10);
+						}
+
+						if(temp_word%100 <= 9){
+							lcd_cursor(2,4);
+							lcd_string_write("0");
+							lcd_number_write(temp_word%100,10);
+						} else {
+							lcd_cursor(2,4);
+							lcd_number_write(temp_word%100,10);
+						}
+
+						if(i+1 <= 9)
+							lcd_cursor(2,11);
+						else
+							lcd_cursor(2,10);
+						lcd_number_write(i+1,10);
+
+						lcd_cursor(2,16);
 					}
 
-					if(temp_word2 <= 9)
-					{
-						lcd_cursor(2,4);
-						lcd_string_write("0");
-						lcd_number_write(temp_word2,10);
-					} else {
-						lcd_cursor(2,4);
-						lcd_number_write(temp_word2,10);
-					}
-
-					if(i+1 <= 9)
-						lcd_cursor(2,11);
-					if(i+1 > 9)
-						lcd_cursor(2,10);
-					lcd_number_write(i+1,10);
-					lcd_cursor(2,15);
-					lcd_number_write(intervals,10);
 					temp1=PINA;
 					if((temp1 & 0x01)!=0x00) // OK button
 					{
@@ -738,16 +768,37 @@ int menu_option_mode(const int mode_addr){
 							}
 						}
 						eeprom_write_word((uint16_t *) (mode_addr+i*2+2) , (hr*100+min));
+						//------------------------------------------
+						lcd_cursor(1,1);
+						lcd_string_write("HRS:MIN   P");
+
+						switch(mode_addr){
+							case MODE0:
+								lcd_number_write(0,10);
+								break;
+							case MODE1:
+								lcd_number_write(1, 10);
+								break;
+							case MODE2:
+								lcd_number_write(2, 10);
+								break;
+						}
+						lcd_string_write(" T");
 						lcd_cursor(2,1);
-						lcd_string_write("                ");
+						lcd_string_write("  :         of  ");
+						lcd_cursor(2,15);
+						lcd_number_write(intervals,10);
+						// This code is same as the code before while loop
+						//---------------------------------------
 					}
 					if((temp1 & 0x02)!=0x00) // EXIT button
 					{
 						lcd_command_write(0x01); //clear screen
 						return 1;
 					}
+					i_prev = i;
 
-					}
+				}
 			}
 		}
 
@@ -761,7 +812,7 @@ int menu_option_mode(const int mode_addr){
 
 int main(){
 
-	int yr =0, menu = 0, menu_select = 0, sub_select =0, r = 0, d = 0;
+	int yr =0, menu = 0,menu_prev=5, menu_select = 0, sub_select =0, r = 0, d = 0;
 	int leap[12]={-1,2,3,6,1,4,6,2,5,0,3,5};
 	int nonleap[12]={0,3,3,6,1,4,6,2,5,0,3,5};
 
@@ -833,44 +884,70 @@ int main(){
 
 			//menu
 			menu:
+			menu_prev = 5;
 			lcd_cursor(1,1);
 			lcd_string_write("MENU:           ");
 
+			lcd_cursor(2,10);
+			lcd_string_write("Clock");
 			while(1)
 			{
 				temp1 = PINA;
-				menu = ReadVoltage();
-				lcd_cursor(2,1);
-				if(menu > 0 && menu <= 60)
-				{
-					// set master time
-					lcd_string_write("| Master Clock >");
-					menu_select=1;
-					//goto master_clock;
+				menu = menu_scroll_4();
+
+				if(menu != menu_prev){
+					lcd_cursor(2,1);
+					if(menu == 1)
+					{
+						// set master time
+						lcd_string_write("| Master");
+						lcd_cursor(2,16);
+						lcd_string_write(">");
+						menu_select=1;
+						//goto master_clock;
+					}
+
+					if(menu > 1 && menu <= 4){
+						lcd_string_write("< P");
+						if(menu_prev == 1){
+							lcd_cursor(2,4);
+							lcd_string_write("     ");
+						}else if(menu_prev ==4){
+							lcd_cursor(2,16);
+							lcd_string_write(">");
+						}
+						if(menu == 2)
+						{
+						// set P0 time
+							lcd_cursor(2,4);
+							lcd_string_write("0");
+							menu_select=2;
+							//goto P0_clock;
+						}
+						if(menu == 3)
+						{
+						// set P1 time
+							lcd_cursor(2,4);
+							lcd_string_write("1");
+							menu_select=3;
+						}
+						if(menu == 4)
+						{
+						// set P2 time
+							lcd_cursor(2,4);
+							lcd_string_write("2");
+							lcd_cursor(2,16);
+							lcd_string_write("|");
+							menu_select=4;
+						}
+					}
 				}
-				if(menu > 60 && menu <= 120)
-				{
-				// set P0 time
-					lcd_string_write("<  P0   Clock  >");
-					menu_select=2;
-					//goto P0_clock;
-				}
-				if(menu > 120 && menu <= 180)
-				{
-				// set P1 time
-					lcd_string_write("<  P1   Clock  >");
-					menu_select=3;
-				}
-				if(menu > 180 && menu <= 255)
-				{
-				// set P2 time
-					lcd_string_write("<  P2   Clock  |");
-					menu_select=4;
-				}
+				menu_prev = menu;
 				if((temp1 & 0x02)!=0x00) // EXIT button
 				{
 					lcd_command_write(0x01); //clear screen
 					menu_select=0;
+					date_prev = 32, month_prev = 15, year_prev = 100, hr_prev = 25, min_prev = 60, sec_prev = 60;
 					goto main;
 				}
 
@@ -1075,10 +1152,10 @@ int main(){
 						break;
 					}
 				}
+				lcd_cursor(2,16);
 			}
 		}
 		// RUN MODE: either P0(normal routine); P1(exam routine); P2/Intervals?(custom routine
-		display_date_time_format();	// draw / / for date and : : for time on LCD
 		if((temp1 & 0x10)!=0x00)
 		{
 			menu_option_run(MODE1);
