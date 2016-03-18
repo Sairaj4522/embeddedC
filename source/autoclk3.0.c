@@ -335,7 +335,7 @@ void display_time(void) {
 	}
 	date_prev = date;
 
-	if(month != month_prev)
+	if(month != month_prev){
 		if(month<=9){
 			lcd_cursor(1,6);
 			lcd_string_write("0");
@@ -345,9 +345,10 @@ void display_time(void) {
 				lcd_cursor(1,6);
 				lcd_number_write(month,10);
 		}
+	}
 	month_prev = month;
 
-	if(year != year_prev)
+	if(year != year_prev){
 		if(year<=9){
 			lcd_cursor(1,9);
 			lcd_string_write("0");
@@ -357,13 +358,14 @@ void display_time(void) {
 			lcd_cursor(1,9);
 			lcd_number_write(year,10);
 		}
+	}
 
 	year_prev = year;
 
 
 
 	// displaying style
-	if(hr != hr_prev)
+	if(hr != hr_prev){
 		if(hr<=9){
 			lcd_cursor(2,3);
 			lcd_string_write("0");
@@ -373,9 +375,10 @@ void display_time(void) {
 			lcd_cursor(2,3);
 			lcd_number_write(hr,10);
 		}
+	}
 	hr_prev = hr;
 
-	if(min != min_prev)
+	if(min != min_prev){
 		if(min<=9){
 			lcd_cursor(2,6);
 			lcd_string_write("0");
@@ -385,9 +388,10 @@ void display_time(void) {
 			lcd_cursor(2,6);
 			lcd_number_write(min,10);
 		}
+	}
 	min_prev = min;
 
-	if(sec != sec_prev)
+	if(sec != sec_prev){
 		if(sec<=9){
 			lcd_cursor(2,9);
 			lcd_string_write("0");
@@ -397,6 +401,7 @@ void display_time(void) {
 			lcd_cursor(2,9);
 			lcd_number_write(sec,10);
 		}
+	}
 	sec_prev = sec;
 
 
