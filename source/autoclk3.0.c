@@ -1,7 +1,6 @@
 /*************************************************************
 *	Microcontroller			:ATmega32
 *	Date: 22-JANUARY-2015
-*	Last modified: 12-FEBRUARY-2015
 *
 *	10-Feb-2015
 *	Swapped PORTB and PORTD Connections so as to solve PCB routing problem
@@ -40,24 +39,23 @@
 * 	Made a couple more changes to PCB layout and the final PCB Rev1.0 is backed up in ~/bkps as eagle120220151016bkp.zip
 *
 *	13-Feb-2015
-*	One possibility brought up today about the Autoclk 2.0 Duos (installed in Homeopathy College)
-*	problem of showing wierd characters on display and the lcd getting stuck when the relay is activated
-*	the problem is that the way the power supply circuit on the board.
-*	The board has a DC connector to which we connect 12v 1A adapter, following that is the 7805 voltage regulator
-*	and this Voltage regulator supplies power to the entire circuit, the other part connected to the 12V supply is the Relay
-*	and ULN2003 relay driver. So the entire circuit in view of the Power supply (12V Dc adapter) is
-*	like 7805 circuit(and the circuit it powers i.e microcontroller, LCD and other IC and component connected to 5v dc supply)
-*	in PARALLEL with the Relay circuit(which includes ULN2003 and the Relay).
-*	So when the Relay is activated, the relay will draw a certain amount of current so as to lock the coil, and since it's in parallel
-*	with the 7805 circuit there will be less current flowing in 7805 circuit as compared to the previous condition when Relay wasnt active.
-*	So this is a possibility why there's problem with that autoclk. Now same power supply circuit design has been implemented in Autoclk 3.0
-*	hence we will face same problems.
+*	One possibility brought up today about the problem of showing wierd characters on display and the lcd getting stuck 
+*   when the relay is activated the problem is that the way the power supply circuit on the board. The board has a DC 
+*   connector to which we connect 12v 1A adapter, following that is the 7805 voltage regulator and this Voltage regulator
+*   supplies power to the entire circuit, the other part connected to the 12V supply is the Relay and ULN2003 relay driver.
+*   So the entire circuit in view of the Power supply (12V Dc adapter) is like 7805 circuit(and the circuit it powers i.e 
+*   microcontroller, LCD and other IC and component connected to 5v dc supply) in PARALLEL with the Relay circuit(which
+*   includes ULN2003 and the Relay).
+*	So when the Relay is activated, the relay will draw a certain amount of current so as to lock the coil, and since it's
+*   in parallel with the 7805 circuit there will be less current flowing in 7805 circuit as compared to the previous 
+*   condition when Relay wasnt active. So this is a possibility why there's problem with that version. Now same power supply
+*   circuit design has been implemented in current version hence we will face same problems.
 *
-*	Added one more Mode switch to the PCB design so as to support Duos version of the Autoclk Product.
+*	Added one more Mode switch to the PCB design so as to support second version.
 *	Need to update code so as to support that functionality.
 *
 *	23-Oct-2015
-*	Added Buzzer to eagle schematic and pcb, and final change has been done for this version of AutoClk
+*	Added Buzzer to eagle schematic and pcb, and final change has been done for this version
 *
 *	Port C Pins usage
 *	PC2		Buzzer
@@ -842,18 +840,6 @@ int main(){
 
 	lcd_init();	//LCD initialization
 
-	/*String display in 1st row of LCD*/
-	lcd_cursor(1,1);
-	lcd_string_write("-----EXMPLR-----");
-	lcd_command_write(0xc0);
-
-	/*Cursor moves to 2nd row 1st column of LCD*/
-	lcd_cursor(2,1);
-	lcd_string_write("  AUTOCLK  3.0  ");
-	/*String display in 2nd row of LCD*/
-
-	_delay_ms(100);
-	/*Display stays for 2 second*/
 	lcd_command_write(0x01);
 		/*Clear screen*/
 
